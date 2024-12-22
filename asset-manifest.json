@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/Roznama/static/css/main.e6c13ad2.css",
-    "main.js": "/Roznama/static/js/main.6ee01f2c.js",
+    "main.css": "/Roznama/static/css/main.22c81b9d.css",
+    "main.js": "/Roznama/static/js/main.6c386d91.js",
     "static/js/453.59b8a61b.chunk.js": "/Roznama/static/js/453.59b8a61b.chunk.js",
+    "static/media/logo.png": "/Roznama/static/media/logo.3bf529b2b004b5cf8a2c.png",
     "index.html": "/Roznama/index.html",
-    "main.e6c13ad2.css.map": "/Roznama/static/css/main.e6c13ad2.css.map",
-    "main.6ee01f2c.js.map": "/Roznama/static/js/main.6ee01f2c.js.map",
+    "main.22c81b9d.css.map": "/Roznama/static/css/main.22c81b9d.css.map",
+    "main.6c386d91.js.map": "/Roznama/static/js/main.6c386d91.js.map",
     "453.59b8a61b.chunk.js.map": "/Roznama/static/js/453.59b8a61b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e6c13ad2.css",
-    "static/js/main.6ee01f2c.js"
+    "static/css/main.22c81b9d.css",
+    "static/js/main.6c386d91.js"
   ]
 }
