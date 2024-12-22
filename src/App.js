@@ -7,9 +7,9 @@ function App() {
   return (
     <div clasName="">
       <Routes>
-        <Route path = "/" element = {<Articles />}/>
-        <Route path = "/reminders" element = {<Reminders />}/>
-        <Route path = "/tips" element = {<Tips />}/>
+        <Route path = "/Roznama/" element = {<Articles />}/>
+        <Route path = "/Roznama/reminders" element = {<Reminders />}/>
+        <Route path = "/Roznama/tips" element = {<Tips />}/>
       </Routes>
     </div>
   );
