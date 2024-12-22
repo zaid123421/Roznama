@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/Roznama/static/css/main.22c81b9d.css",
-    "main.js": "/Roznama/static/js/main.0142d8d7.js",
-    "static/js/453.59b8a61b.chunk.js": "/Roznama/static/js/453.59b8a61b.chunk.js",
-    "static/media/logo.png": "/Roznama/static/media/logo.3bf529b2b004b5cf8a2c.png",
-    "index.html": "/Roznama/index.html",
-    "main.22c81b9d.css.map": "/Roznama/static/css/main.22c81b9d.css.map",
-    "main.0142d8d7.js.map": "/Roznama/static/js/main.0142d8d7.js.map",
-    "453.59b8a61b.chunk.js.map": "/Roznama/static/js/453.59b8a61b.chunk.js.map"
+    "main.css": "./static/css/main.22c81b9d.css",
+    "main.js": "./static/js/main.9230f654.js",
+    "static/js/453.59b8a61b.chunk.js": "./static/js/453.59b8a61b.chunk.js",
+    "static/media/logo.png": "./static/media/logo.3bf529b2b004b5cf8a2c.png",
+    "index.html": "./index.html",
+    "main.22c81b9d.css.map": "./static/css/main.22c81b9d.css.map",
+    "main.9230f654.js.map": "./static/js/main.9230f654.js.map",
+    "453.59b8a61b.chunk.js.map": "./static/js/453.59b8a61b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.22c81b9d.css",
-    "static/js/main.0142d8d7.js"
+    "static/js/main.9230f654.js"
   ]
 }
