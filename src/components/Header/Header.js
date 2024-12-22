@@ -16,25 +16,25 @@ export default function Header() {
           isOpened &&
           <ul className = "flex w-full absolute top-[100%] right-0 flex-col bg-green-100 border-solid border-2 border-green-500 rounded-md">
             <li className = 'text-lg text-center mt-[5px]'>
-              <NavLink to = "/Roznama/reminders" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>التذكيرات</NavLink>
+              <NavLink to = "/reminders" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>التذكيرات</NavLink>
             </li>
             <li className = 'text-lg text-center my-[10px]'>
-              <NavLink to = "/Roznama/tips" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>النصائح</NavLink>
+              <NavLink to = "/tips" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>النصائح</NavLink>
             </li>
             <li className = 'text-lg text-center mb-[5px]'>
-              <NavLink to = "/Roznama/" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>المقالات</NavLink>
+              <NavLink to = "/" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>المقالات</NavLink>
             </li>
           </ul>
         }
       <ul className = 'lg:flex min-[0px]:hidden max-[1024px]'>
         <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/Roznama/reminders" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>التذكيرات</NavLink>
+          <NavLink to = "/reminders" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>التذكيرات</NavLink>
         </li>
         <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/Roznama/tips" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>النصائح</NavLink>
+          <NavLink to = "/tips" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>النصائح</NavLink>
         </li>
         <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/Roznama/" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>المقالات</NavLink>
+          <NavLink to = "/" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>المقالات</NavLink>
         </li>
       </ul>
       <img className = "logo w-[175px] h-[130px]" alt = "logo" src = {logo}/>
