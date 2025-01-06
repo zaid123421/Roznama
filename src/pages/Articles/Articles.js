@@ -158,7 +158,7 @@ export default function Articles() {
           </div>
           <div className="flex flex-col mt-[15px]">
             <span className="flex justify-end mb-[5px]">شرح عن الباب</span>
-            <textarea className={`resize-none border-2 border-[#AEAEAE] rounded-lg p-[10px]  min-h-[175px] ${
+            <textarea className={`resize-none border-2 border-[#AEAEAE] rounded-lg p-[10px] min-h-[175px] ${
               direction === "rtl" ? "text-right" : "text-left"
               }`}
               style={{ direction }}
@@ -288,7 +288,7 @@ export default function Articles() {
           </div>
         </div>
       )}
-      <div className="articles-content container px-[25px] m-auto">
+      <div className="articles-content container px-[25px] m-auto mt-[25px]">
         {/* صندوق الباب وتفاصيله */}
         <div className="door-box cursor-pointer">
           <span className="font-bold">اسم الباب</span>
