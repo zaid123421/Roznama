@@ -1,43 +1,135 @@
-import { NavLink } from 'react-router-dom';
-import logo from '../../assets/logo.png';
+import { NavLink } from "react-router-dom";
+import logo from "../../assets/logowithbg.jpg";
 import "./Header.css";
-import { useState } from 'react';
+import { useState } from "react";
 export default function Header() {
   const [isOpened, setIsOpened] = useState(false);
+  const [direction, setDirection] = useState("rtl");
 
   function handleClick() {
     setIsOpened(!isOpened);
   }
 
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    if (/[\u0600-\u06FF]/.test(value)) {
+      setDirection("rtl");
+    } else {
+      setDirection("ltr");
+    }
+  };
+
+  const handleBlur = () => {
+    setDirection("rtl");
+  };
+
   return (
-    <div className = "container px-[25px] m-auto flex justify-between items-center relative">
-        <i onClick = {handleClick} className = "lg:hidden hover:text-green-600 duration-300 cursor-pointer text-2xl fa-solid fa-bars-staggered"></i>
-        {
-          isOpened &&
-          <ul className = "flex w-full absolute top-[100%] right-0 flex-col bg-green-100 border-solid border-2 border-green-500 rounded-md">
-            <li className = 'text-lg text-center mt-[5px]'>
-              <NavLink to = "/reminders" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>التذكيرات</NavLink>
+    // The Main Box With Padding
+    <div className="text-base bg-[#46A92F] py-3">
+      {/* The Secondary box */}
+      <div className="container w-full px-[25px] m-auto flex justify-between items-center text-white">
+        <i onClick={handleClick} className="fa-bars-staggered
+          lg:hidden
+          hover:text-black
+          duration-300
+          cursor-pointer
+          text-2xl
+          fa-solid"
+        />
+        {isOpened && (
+          // Small Screend ul
+          <ul className="flex
+            w-full
+            absolute
+            top-[96px]
+            right-0
+            flex-col
+            bg-green-100
+            border-solid
+            border-2
+            border-green-500
+            md:rounded-xl">
+            <li className="text-green-500 duration-300 text-lg text-center mt-[5px]">
+              <NavLink
+                to="/reminders"
+                className={({ isActive }) =>
+                  isActive ? "text-green-600 font-bold" : ""
+                }
+              >
+                التذكيرات
+              </NavLink>
             </li>
-            <li className = 'text-lg text-center my-[10px]'>
-              <NavLink to = "/tips" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>النصائح</NavLink>
+            <li className="text-green-500 duration-300 text-lg text-center my-[10px]">
+              <NavLink
+                to="/tips"
+                className={({ isActive }) =>
+                  isActive ? "text-green-600 font-bold" : ""
+                }
+              >
+                النصائح
+              </NavLink>
             </li>
-            <li className = 'text-lg text-center mb-[5px]'>
-              <NavLink to = "/" className={({ isActive }) => (isActive ? 'text-green-600 font-bold' : '')}>المقالات</NavLink>
+            <li className="text-green-500 duration-300 text-lg text-center mb-[5px]">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? "text-green-600 font-bold" : ""
+                }
+              >
+                المقالات
+              </NavLink>
             </li>
           </ul>
-        }
-      <ul className = 'lg:flex min-[0px]:hidden max-[1024px]'>
-        <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/reminders" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>التذكيرات</NavLink>
-        </li>
-        <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/tips" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>النصائح</NavLink>
-        </li>
-        <li className = 'mr-5 text-2xl hover:text-green-600 duration-300'>
-          <NavLink to = "/" className={({ isActive }) => (isActive ? 'text-green-600 underline underline-offset-[15px]' : '')}>المقالات</NavLink>
-        </li>
-      </ul>
-      <img className = "logo w-[175px] h-[139px]" alt = "logo" src = {logo}/>
+        )}
+        {/* Large Screend ul */}
+        <ul className="lg:flex min-[0px]:hidden max-[1024px]">
+          <li className="mr-5 text-2xl hover:text-black duration-300">
+            <NavLink
+              to="/reminders"
+              className={({ isActive }) =>
+                isActive ? " underline underline-offset-[37px]" : ""
+              }
+            >
+              التذكيرات
+            </NavLink>
+          </li>
+          <li className="mr-5 text-2xl hover:text-black duration-300">
+            <NavLink
+              to="/tips"
+              className={({ isActive }) =>
+                isActive ? "underline underline-offset-[37px]" : ""
+              }
+            >
+              النصائح
+            </NavLink>
+          </li>
+          <li className="mr-5 text-2xl hover:text-black duration-300">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "underline underline-offset-[37px]" : ""
+              }
+            >
+              المقالات
+            </NavLink>
+          </li>
+        </ul>
+        {/* Search Box */}
+        <div className="bg-white hidden md:flex items-center text-black px-[25px] py-[7px] w-[500px] rounded-xl">
+          <i className="fa-solid fa-magnifying-glass text-gray-400"/>
+          <input
+            placeholder="ابحث هنا"
+            className={`flex justify-start w-full outline-none focus:text-right ${
+              direction === "rtl" ? "text-right" : "text-left"
+            }`}
+            style={{ direction }}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+          />
+        </div>
+        {/* Logo */}
+        <img className="logo w-[126px] h-[72px]" alt="logo" src={logo} />
+      </div>
     </div>
   );
 }
