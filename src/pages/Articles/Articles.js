@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
 import "./Articles.css";
+import axios from 'axios'
 
 export default function Articles() {
   // useState
@@ -11,6 +12,13 @@ export default function Articles() {
   const [file, setFile] = useState();
   const [fileName, setFileName] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [blogs, setBlogs] = useState([]);
+  const [refreshPage, setRefreshPage] = useState(1);
+
+  const [form, setForm] = useState({
+    title: "",
+    content: ""
+  });
 
   // useEffect
   useEffect(() => {
@@ -23,7 +31,118 @@ export default function Articles() {
       document.body.style.overflow = "auto";
     };
   }, [doorModelState]);
-  
+
+  useEffect(() => {
+    axios.get("http://199.192.19.220:8080/api/v1/blogs", {
+      headers: {
+        Accept: "application/json",
+        Authorization: " Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875" ,
+      },
+    })
+    .then((data) => setBlogs(data.data.data))
+    .catch((err) => console.log(err));
+  }, [refreshPage])
+
+  console.log(blogs);
+
+  // Show Blogs
+  const showBlogs = blogs.map((blog, index) => 
+    <div className="door-box cursor-pointer">
+    <span className="font-bold">{blog.title}</span>
+    <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
+      {blog.content}
+    </p>
+    <div className="flex justify-between mt-[15px]">
+      <div>
+        <i className="fa-solid
+          fa-wand-magic
+          bg-[#F1F1F1]
+          w-[30px]
+          h-[30px]
+          md:w-[40px]
+          md:h-[40px]
+          inline-flex
+          justify-center
+          items-center
+          rounded-md
+          cursor-pointer
+          text-[#535763]
+          duration-300
+          hover:bg-slate-200"
+        />
+        <i onClick={() => handleDeleteDoor(blog.id)} className="fa-solid
+          fa-trash
+          w-[30px]
+          h-[30px]
+          md:w-[40px]
+          md:h-[40px]
+          inline-flex
+          justify-center
+          items-center
+          bg-[#F1F1F1]
+          mr-[10px]
+          rounded-md
+          cursor-pointer
+          text-[#BF305E]
+          duration-300 
+          hover:bg-slate-200"
+        />
+      </div>
+      <button onClick={handleArticleModelState} className="bg-[#3FAB21]
+        border-2
+        border-[#3FAB21]
+        rounded-[10px]
+        px-[8px]
+        md:px-[12px]
+        text-white
+        hover:text-black
+        hover:bg-transparent
+        duration-300"
+      >
+        <i className="fa-solid fa-plus ml-[10px]"/>
+        إضافة مقال
+      </button>
+    </div>
+  </div>
+  )
+
+  async function handleDeleteDoor(id) {
+    try{
+      let res = await axios.delete(`http://199.192.19.220:8080/api/v1/blogs/${id}`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: " Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875" ,
+        },
+      });
+      console.log(res);
+      if(res.status === 204)
+      console.log("Done !");
+      setRefreshPage(refreshPage + 1);
+    }
+    catch {
+      console.log("None");
+    }
+  }
+
+  async function Submit(e){
+    e.preventDefault();
+    const data = new FormData();
+    data.append("title", form.title);
+    data.append("content", form.content);
+    try { 
+      const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, data, {
+          headers: {
+            'Authorization': `Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875`,
+          }
+        }
+      );
+      console.log('Yes !');
+      setRefreshPage((prev) => prev + 1 );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   // useRef
     const inputImageRef = useRef(null);
     const inputFileRef = useRef(null);
@@ -98,6 +217,10 @@ export default function Articles() {
     }
   };
 
+  function handleChange(e){
+    setForm({ ...form, [e.target.name]: e.target.value});
+  }
+
   return (
     <div className="text-base md:text-xl">
       <Header />
@@ -152,7 +275,9 @@ export default function Articles() {
               direction === "rtl" ? "text-right" : "text-left"
               }`}
               style={{ direction }}
-              onChange={handleTextDirection}
+              name="title"
+              value = {form.title}
+              onChange = {(e) => {handleChange(e);handleTextDirection(e)}}
               onBlur={handleBlur}
             />
           </div>
@@ -161,13 +286,14 @@ export default function Articles() {
             <textarea className={`resize-none border-2 border-[#AEAEAE] rounded-lg p-[10px] min-h-[175px] ${
               direction === "rtl" ? "text-right" : "text-left"
               }`}
+              name="content"
               style={{ direction }}
-              onChange={handleTextDirection}
+              value = {form.content} onChange = {(e) => {handleChange(e);handleTextDirection(e)}}
               onBlur={handleBlur}
             />
           </div>
           <div className="flex justify-between mt-[15px]">
-            <button
+            <button onClick={Submit}
               className="bg-green-600
               text-white
               w-[100px]
@@ -288,67 +414,9 @@ export default function Articles() {
           </div>
         </div>
       )}
-      <div className="articles-content container px-[25px] m-auto mt-[25px]">
+      <div className="articles-content container px-[25px] m-auto my-[25px]">
         {/* صندوق الباب وتفاصيله */}
-        <div className="door-box cursor-pointer">
-          <span className="font-bold">اسم الباب</span>
-          <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5]">
-            هذا النص هو للتجربة فقط ولا يمكننا التغيير حيث هذا النص هو مجرد
-            للإطلاع حيث اكتب الكثير من الكلام لمجرد معرفة فيما اذا كان الصندوق
-            سيحمل البيانات ام لا
-          </p>
-          <div className="flex justify-between mt-[15px]">
-            <div>
-              <i className="fa-solid
-                fa-wand-magic
-                bg-[#F1F1F1]
-                w-[30px]
-                h-[30px]
-                md:w-[40px]
-                md:h-[40px]
-                inline-flex
-                justify-center
-                items-center
-                rounded-md
-                cursor-pointer
-                text-[#535763]
-                duration-300
-                hover:bg-slate-200"
-              />
-              <i className="fa-solid
-                w-[30px]
-                h-[30px]
-                md:w-[40px]
-                md:h-[40px]
-                inline-flex
-                justify-center
-                items-center
-                fa-trash
-                bg-[#F1F1F1]
-                mr-[10px]
-                rounded-md
-                cursor-pointer
-                text-[#BF305E]
-                duration-300 
-                hover:bg-slate-200"
-              />
-            </div>
-            <button onClick={handleArticleModelState} className="bg-[#3FAB21]
-              border-2
-              border-[#3FAB21]
-              rounded-[10px]
-              px-[8px]
-              md:px-[12px]
-              text-white
-              hover:text-black
-              hover:bg-transparent
-              duration-300"
-            >
-              <i className="fa-solid fa-plus ml-[10px]"/>
-              إضافة مقال
-            </button>
-          </div>
-        </div>
+        {showBlogs}
       </div>
     </div>
   );

@@ -51,22 +51,22 @@ export default function Header() {
             md:rounded-xl">
             <li className="text-green-500 duration-300 text-lg text-center mt-[5px]">
               <NavLink
-                to="/reminders"
+                to="/welcoemail"
                 className={({ isActive }) =>
                   isActive ? "text-green-600 font-bold" : ""
                 }
               >
-                التذكيرات
+                الترحيب والبريد
               </NavLink>
             </li>
             <li className="text-green-500 duration-300 text-lg text-center my-[10px]">
               <NavLink
-                to="/tips"
+                to="/stickers"
                 className={({ isActive }) =>
                   isActive ? "text-green-600 font-bold" : ""
                 }
               >
-                النصائح
+                ملصقات
               </NavLink>
             </li>
             <li className="text-green-500 duration-300 text-lg text-center mb-[5px]">
@@ -76,7 +76,7 @@ export default function Header() {
                   isActive ? "text-green-600 font-bold" : ""
                 }
               >
-                المقالات
+                مقالات
               </NavLink>
             </li>
           </ul>
@@ -85,22 +85,22 @@ export default function Header() {
         <ul className="lg:flex min-[0px]:hidden max-[1024px]">
           <li className="mr-5 text-2xl hover:text-black duration-300">
             <NavLink
-              to="/reminders"
+              to="/welcoemail"
               className={({ isActive }) =>
                 isActive ? " underline underline-offset-[37px]" : ""
               }
             >
-              التذكيرات
+              الترحيب والبريد
             </NavLink>
           </li>
           <li className="mr-5 text-2xl hover:text-black duration-300">
             <NavLink
-              to="/tips"
+              to="/stickers"
               className={({ isActive }) =>
                 isActive ? "underline underline-offset-[37px]" : ""
               }
             >
-              النصائح
+              ملصقات
             </NavLink>
           </li>
           <li className="mr-5 text-2xl hover:text-black duration-300">
@@ -110,7 +110,7 @@ export default function Header() {
                 isActive ? "underline underline-offset-[37px]" : ""
               }
             >
-              المقالات
+              مقالات
             </NavLink>
           </li>
         </ul>
