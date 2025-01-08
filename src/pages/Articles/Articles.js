@@ -36,7 +36,7 @@ export default function Articles() {
     axios.get("http://199.192.19.220:8080/api/v1/blogs", {
       headers: {
         Accept: "application/json",
-        Authorization: " Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875" ,
+        Authorization: " Bearer 2|pG8rktMiWrygmLy0nUp3c2mfHJSuflnBB62vfPNh8c223f32" ,
       },
     })
     .then((data) => setBlogs(data.data.data))
@@ -111,7 +111,7 @@ export default function Articles() {
       let res = await axios.delete(`http://199.192.19.220:8080/api/v1/blogs/${id}`, {
         headers: {
           Accept: "application/json",
-          Authorization: " Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875" ,
+          Authorization: " Bearer 2|pG8rktMiWrygmLy0nUp3c2mfHJSuflnBB62vfPNh8c223f32" ,
         },
       });
       console.log(res);
@@ -132,7 +132,7 @@ export default function Articles() {
     try { 
       const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, data, {
           headers: {
-            'Authorization': `Bearer 2|vOWY0mFvqfJTDVtaD6FiKIzRvfsTbdyyDCfnSikF51ae4875`,
+            'Authorization': `Bearer 2|pG8rktMiWrygmLy0nUp3c2mfHJSuflnBB62vfPNh8c223f32`,
           }
         }
       );

@@ -28,7 +28,9 @@ export default function Header() {
     <div className="text-base bg-[#46A92F] py-3">
       {/* The Secondary box */}
       <div className="container w-full px-[25px] m-auto flex justify-between items-center text-white">
-        <i onClick={handleClick} className="fa-bars-staggered
+        <i
+          onClick={handleClick}
+          className="fa-bars-staggered
           lg:hidden
           hover:text-black
           duration-300
@@ -38,7 +40,8 @@ export default function Header() {
         />
         {isOpened && (
           // Small Screend ul
-          <ul className="flex
+          <ul
+            className="flex
             w-full
             absolute
             top-[96px]
@@ -48,7 +51,8 @@ export default function Header() {
             border-solid
             border-2
             border-green-500
-            md:rounded-xl">
+            md:rounded-xl"
+          >
             <li className="text-green-500 duration-300 text-lg text-center mt-[5px]">
               <NavLink
                 to="/welcoemail"
@@ -115,8 +119,8 @@ export default function Header() {
           </li>
         </ul>
         {/* Search Box */}
-        <div className="bg-white hidden md:flex items-center text-black px-[25px] py-[7px] w-[500px] rounded-xl">
-          <i className="fa-solid fa-magnifying-glass text-gray-400"/>
+        <div className="bg-white hidden md:flex items-center text-black px-[25px] py-[7px] w-[350px] rounded-xl">
+          <i className="fa-solid fa-magnifying-glass text-gray-400" />
           <input
             placeholder="ابحث هنا"
             className={`flex justify-start w-full outline-none focus:text-right ${
