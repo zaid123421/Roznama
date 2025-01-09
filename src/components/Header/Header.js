@@ -55,7 +55,7 @@ export default function Header() {
           >
             <li className="text-green-500 duration-300 text-lg text-center mt-[5px]">
               <NavLink
-                to="/welcoemail"
+                to="/tips"
                 className={({ isActive }) =>
                   isActive ? "text-green-600 font-bold" : ""
                 }
@@ -89,7 +89,7 @@ export default function Header() {
         <ul className="lg:flex min-[0px]:hidden max-[1024px]">
           <li className="mr-5 text-2xl hover:text-black duration-300">
             <NavLink
-              to="/welcoemail"
+              to="/tips"
               className={({ isActive }) =>
                 isActive ? " underline underline-offset-[37px]" : ""
               }

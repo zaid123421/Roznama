@@ -1,10 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import Articles from "./pages/Articles/Articles";
-import Tips from "./pages/Tips/Stickers";
-import Reminders from "./pages/Reminders/Reminders";
 import Door from "./pages/Articles/Door";
-import WelcomeMail from "./pages/Reminders/Reminders";
-import Stickers from "./pages/Tips/Stickers";
+import Stickers from "./pages/Stickers/Stickers";
+import Tips from "./pages/Tips/Tips";
+
 
 function App() {
   return (
@@ -13,7 +12,7 @@ function App() {
         <Route path="/" element={<Articles />} />
         <Route path="/door" element={<Door />} />
         <Route path="/stickers" element={<Stickers />} />
-        <Route path="/welcoemail" element={<WelcomeMail />} />
+        <Route path="/tips" element={<Tips />} />
       </Routes>
     </div>
   );
