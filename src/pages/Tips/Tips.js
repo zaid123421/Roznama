@@ -60,8 +60,8 @@ export default function Tips() {
       <td className="text-center p-[10px]">
         {(advice.created_at).slice(0, 10)}
       </td>
-      <td className="text-end md:text-center p-[10px] md:pl-[50px] font-bold">
-      {advice.content}
+      <td className="text-[14px] md:text-[18px] text-end md:text-center p-[10px] py-[20px] md:pl-[50px] font-bold">
+        {advice.content}
       </td>
     </tr>
   )

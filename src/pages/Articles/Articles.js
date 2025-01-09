@@ -25,7 +25,7 @@ export default function Articles() {
 
   // useEffect
   useEffect(() => {
-    if (doorModelState || articleModelState) {
+    if (doorModelState || editDoorModelState || articleModelState) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -33,7 +33,7 @@ export default function Articles() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [doorModelState, articleModelState]);
+  }, [doorModelState, editDoorModelState, articleModelState]);
 
   useEffect(() => {
     axios
@@ -238,12 +238,6 @@ export default function Articles() {
     }
   };
 
-  const handleFileClick = () => {
-    if (inputFileRef.current) {
-      inputFileRef.current.click();
-    }
-  };
-
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -300,8 +294,8 @@ export default function Articles() {
           <i className="fa-solid fa-door-open"></i>
         </div>
       </div>
+      {/* مودل إدخال الباب */}
       {doorModelState && (
-        // صندوق إدخال الباب
         <div
           className="insert-box
         px-[15px]
@@ -357,7 +351,7 @@ export default function Articles() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <button
-                onClick={Submit}
+                onClick={() => {handleDoorModelState(); Submit()}}
                 className="bg-green-600
               text-white
               w-[100px]
@@ -388,6 +382,7 @@ export default function Articles() {
           </div>
         </div>
       )}
+      {/* مودل تعديل الباب */}
       {editDoorModelState && (
         // صندوق إدخال الباب
         <div
@@ -445,7 +440,7 @@ export default function Articles() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <button
-                onClick={Edit}
+                onClick={() => {handleEditDoorModelState();Edit()}}
                 className="bg-green-600
               text-white
               w-[100px]
@@ -476,6 +471,7 @@ export default function Articles() {
           </div>
         </div>
       )}
+      {/* مودل إضافة مقال لباب */}
       {articleModelState && (
         // صندوق إدخال المقال
         <div
@@ -503,7 +499,7 @@ export default function Articles() {
                 onDragLeave={handleDrag}
                 onClick={handleImageClick}
                 onDrop={handleDrop}
-                className="relative flex items-center justify-center my-[10px] bg-[#F1F1F1] w-full h-[175px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
+                className="relative flex items-center justify-center my-[10px] bg-[#F1F1F1] w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
               >
                 <input
                   ref={inputImageRef}
@@ -540,7 +536,7 @@ export default function Articles() {
               <span>محتوى المقال</span>
               <div className="flex items-center my-[10px] bg-[#F1F1F1] w-full rounded-[15px]">
                 <textarea
-                  className="min-h-[175px] w-full bg-transparent focus:outline-none resize-none py-[10px] px-[20px] border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] rounded-[15px]"
+                  className="min-h-[150px] w-full bg-transparent focus:outline-none resize-none py-[10px] px-[20px] border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] rounded-[15px]"
                   style={{ direction }}
                   onBlur={handleBlur}
                   name="content"
