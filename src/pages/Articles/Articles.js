@@ -37,7 +37,7 @@ export default function Articles() {
 
   useEffect(() => {
     axios
-      .get("http://199.192.19.220:8080/api/v1/sections", {
+      .get("https://199.192.19.220:8080/api/v1/sections", {
         headers: {
           Accept: "application/json",
         },
@@ -121,6 +121,78 @@ export default function Articles() {
     </div>
   ));
 
+  // useRef
+  const inputImageRef = useRef(null);
+
+  // Mapping
+  const imagesShow = images.map((img, key) => (
+    <img
+      className="absolute right-0 top-0 rounded-[10px] h-full w-full"
+      src={URL.createObjectURL(img)}
+      alt="Test"
+    />
+  ));
+
+  // Functions
+  function handleDoorModelState() {
+    setDoorModelState(!doorModelState);
+    setName("");
+    setAbout("");
+  }
+
+  function handleEditDoorModelState() {
+    setEditDoorModelState(!editDoorModelState);
+    setName("");
+    setAbout("");
+  }
+
+  function handleArticleModelState() {
+    setArticleModelState(!articleModelState);
+    setImages([]);
+    setTitle("");
+    setContent("");
+  }
+
+  const handleTextDirection = (e) => {
+    const value = e.target.value;
+    if (/[\u0600-\u06FF]/.test(value)) {
+      setDirection("rtl");
+    } else {
+      setDirection("ltr");
+    }
+  };
+
+  const handleBlur = () => {
+    setDirection("rtl");
+  };
+
+  const handleImageClick = () => {
+    if (inputImageRef.current) {
+      inputImageRef.current.click();
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setImages([...images, ...e.dataTransfer.files]); // تحديث الملفات
+      e.dataTransfer.clearData();
+    }
+  };
+
+  // Communicating With Backend
   async function handleDeleteDoor(id) {
     try {
       const res = await axios.delete(`${BASE_URL}/sections/${id}`, {
@@ -134,7 +206,7 @@ export default function Articles() {
     }
   }
 
-  async function Submit(e) {
+  async function Submit() {
     try {
       const res = await axios.post(`${BASE_URL}/sections`, {
         headers: {
@@ -185,78 +257,6 @@ export default function Articles() {
       console.log(error);
     }
   }
-
-  // useRef
-  const inputImageRef = useRef(null);
-  const inputFileRef = useRef(null);
-
-  // Mapping
-  const imagesShow = images.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[10px] h-full w-full"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
-
-  // Handling
-  function handleDoorModelState() {
-    setDoorModelState(!doorModelState);
-    setName("");
-    setAbout("");
-  }
-
-  function handleEditDoorModelState() {
-    setEditDoorModelState(!editDoorModelState);
-    setName("");
-    setAbout("");
-  }
-
-  function handleArticleModelState() {
-    setArticleModelState(!articleModelState);
-    setImages([]);
-    setTitle("");
-    setContent("");
-  }
-
-  const handleTextDirection = (event) => {
-    const value = event.target.value;
-    if (/[\u0600-\u06FF]/.test(value)) {
-      setDirection("rtl");
-    } else {
-      setDirection("ltr");
-    }
-  };
-
-  const handleBlur = () => {
-    setDirection("rtl");
-  };
-
-  const handleImageClick = () => {
-    if (inputImageRef.current) {
-      inputImageRef.current.click();
-    }
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setImages([...images, ...e.dataTransfer.files]); // تحديث الملفات
-      e.dataTransfer.clearData();
-    }
-  };
 
   return (
     <div className="text-base md:text-xl">
@@ -581,6 +581,7 @@ export default function Articles() {
           </div>
         </div>
       )}
+      {/* صندوق المحتوى يعني صندوق الأبواب */}
       <div className="articles-content container px-[25px] m-auto my-[25px]">
         {/* صندوق الباب وتفاصيله */}
         {showBlogs}
