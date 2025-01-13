@@ -37,7 +37,7 @@ export default function Articles() {
 
   useEffect(() => {
     axios
-      .get("https://199.192.19.220:8080/api/v1/sections", {
+      .get("https://199.192.19.220/api/v1/sections", {
         headers: {
           Accept: "application/json",
         },
@@ -351,7 +351,10 @@ export default function Articles() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <button
-                onClick={() => {handleDoorModelState(); Submit()}}
+                onClick={() => {
+                  handleDoorModelState();
+                  Submit();
+                }}
                 className="bg-green-600
               text-white
               w-[100px]
@@ -440,7 +443,10 @@ export default function Articles() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <button
-                onClick={() => {handleEditDoorModelState();Edit()}}
+                onClick={() => {
+                  handleEditDoorModelState();
+                  Edit();
+                }}
                 className="bg-green-600
               text-white
               w-[100px]
