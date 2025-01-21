@@ -1,0 +1,15 @@
+.jodit-react-container {
+  width: 100%;
+  /* min-height: 1200px; */
+}
+
+.jodit-container {
+  height: 100% !important;
+  max-width: 100% !important; 
+  overflow: auto;
+}
+.jodit-wysiwyg {
+  height: 350px !important;
+  max-width: 100% !important; 
+  overflow: auto;
+}

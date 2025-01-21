@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, DragEvent } from "react";
 import Header from "../../components/Header/Header";
 
-export default function Door() {
+export default function Section() {
   // useState
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [direction, setDirection] = useState("rtl");
@@ -111,11 +111,10 @@ export default function Door() {
         container
         px-[25px]
         m-auto
-        mt-[25px]
         border-b-2
         border-b-solid
         border-b-black
-        pb-[15px]"
+        py-[15px]"
       >
         <button
           onClick={handleModelState}
@@ -256,7 +255,7 @@ export default function Door() {
         </div>
       )}
       {/* صندوق محتوى الصفحة والجدول */}
-      <div className="mt-[15px] container m-auto px-[10px] md:px-[25px] overflow-x-auto">
+      <div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="text-[#535763]">

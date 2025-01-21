@@ -34,6 +34,12 @@ export default function Stickers() {
           <i className="fa-solid fa-note-sticky"></i>
         </div>
       </div>
+      <div className="container m-auto px-[25px] m-auto my-[25px]">
+        <div className="text-center absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] min-w-[250px] max-w-[450px]">
+          <i className="fa-solid fa-inbox text-gray-500 text-[40px] mb-[10px] sm:text-[50px]"></i>
+          <p>لا يوجد ملصقات بعد، اضغط على "إضافة ملصقات" لإضافة ملصق</p>
+        </div>
+      </div>
     </div>
   );
 }

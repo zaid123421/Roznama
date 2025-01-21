@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
-import "./Articles.css";
+import "./Sections.css";
 import axios from "axios";
 import BASE_URL from "../../config";
+import { useNavigate } from "react-router-dom";
 
-export default function Articles() {
+export default function Sections() {
   // useState
   const [doorModelState, setDoorModelState] = useState(false);
   const [editDoorModelState, setEditDoorModelState] = useState(false);
@@ -22,6 +23,9 @@ export default function Articles() {
   const [content, setContent] = useState("");
 
   const [sectionId, setSectionId] = useState(0);
+
+  // useNavigate
+  const nav = useNavigate();
 
   // useEffect
   useEffect(() => {
@@ -272,11 +276,11 @@ export default function Articles() {
         container
         px-[25px]
         m-auto
-        mt-[25px]
+        mb-[15px]
         border-b-2
         border-b-solid
         border-b-black
-        pb-[15px]"
+        py-[15px]"
       >
         <button
           onClick={() => setDoorModelState(true)}
@@ -588,9 +592,75 @@ export default function Articles() {
         </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-      <div className="articles-content container px-[25px] m-auto my-[25px]">
+      <div className="articles-content container px-[25px] m-auto">
         {/* صندوق الباب وتفاصيله */}
         {showBlogs}
+        <div className="door-box cursor-pointer flex flex-col justify-between">
+      <div>
+        <span className="font-bold">باب التفسير</span>
+        <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
+          test text
+        </p>
+      </div>
+      <div className="flex justify-between mt-[15px]">
+        <div>
+          <i
+            onClick={() => {
+              handleEditDoorModelState();
+            }}
+            className="fa-solid
+            fa-wand-magic
+            bg-[#F1F1F1]
+            w-[30px]
+            h-[30px]
+            md:w-[40px]
+            md:h-[40px]
+            inline-flex
+            justify-center
+            items-center
+            rounded-md
+            cursor-pointer
+            text-[#535763]
+            duration-300
+            hover:bg-slate-200"
+          />
+          <i
+            className="fa-solid
+            fa-trash
+            w-[30px]
+            h-[30px]
+            md:w-[40px]
+            md:h-[40px]
+            inline-flex
+            justify-center
+            items-center
+            bg-[#F1F1F1]
+            mr-[10px]
+            rounded-md
+            cursor-pointer
+            text-[#BF305E]
+            duration-300 
+            hover:bg-slate-200"
+          />
+        </div>
+        <button
+          onClick={() => {nav('./AddBlog')}}
+          className="bg-[#3FAB21]
+          border-2
+          border-[#3FAB21]
+          rounded-[10px]
+          px-[8px]
+          md:px-[12px]
+          text-white
+          hover:text-black
+          hover:bg-transparent
+          duration-300"
+        >
+          <i className="fa-solid fa-plus ml-[10px]" />
+          إضافة مقال
+        </button>
+      </div>
+    </div>
       </div>
     </div>
   );
