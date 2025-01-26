@@ -1,5 +1,5 @@
 .jodit-react-container {
-  width: 100%;
+  max-width: 100%;
   /* min-height: 1200px; */
 }
 
@@ -7,9 +7,21 @@
   height: 100% !important;
   max-width: 100% !important; 
   overflow: auto;
+  border-radius: 15px !important;
 }
 .jodit-wysiwyg {
-  height: 350px !important;
-  max-width: 100% !important; 
+  height: 275px !important;
   overflow: auto;
+  background-color: #F1F1F1;
+}
+.jodit-toolbar-button {
+  background-color: #eee;
+  border-radius: 15px;
+}
+.jodit-status-bar,
+.jodit-toolbar__box{
+  background-color: #F1F1F1 !important;
+}
+.jodit-status-bar{
+  padding: 15px;
 }

@@ -1,18 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Header from "../../components/Header/Header";
-import JoditEditor from 'jodit-react';
-import HTMLReactParser from "html-react-parser";
+import JoditEditor from "jodit-react";
+import Button from "../../components/Button/Button";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function AddBlog() {
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
 
   // useRef
   const inputImageRef = useRef(null);
-  const editor = useRef(null);
+  const contentRef = useRef("");
+
+  // useNavigate
+  const nav = useNavigate();
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const sectionId = params.get('section_id');
+
+  console.log(sectionId); 
 
   // Mapping
   const imagesShow = images.map((img, key) => (
@@ -22,6 +32,10 @@ export default function AddBlog() {
       alt="Test"
     />
   ));
+
+  const handleEditorChange = (newContent) => {
+    contentRef.current = newContent;
+  };
 
   const handleImageClick = () => {
     if (inputImageRef.current) {
@@ -49,49 +63,56 @@ export default function AddBlog() {
     }
   };
 
-  // const handleTextDirection = (e) => {
-  //   const value = e.target.value;
-  //   if (/[\u0600-\u06FF]/.test(value)) {
-  //     setDirection("rtl");
-  //   } else {
-  //     setDirection("ltr");
-  //   }
-  // };
+  const handleTextDirection = (e) => {
+    const value = e.target.value;
+    if (/[\u0600-\u06FF]/.test(value)) {
+      setDirection("rtl");
+    } else {
+      setDirection("ltr");
+    }
+  };
 
-  // const handleBlur = () => {
-  //   setDirection("rtl");
-  // };
+  const handleBlur = () => {
+    setDirection("rtl");
+  };
 
-  // const config = {
-  //   toolbar: [
-  //     ["bold", "italic", "underline", "strikethrough"],
-  //     ["fontSize", "alignment", "unorderedList", "orderedList"],
-  //     ["link", "image"],
-  //   ],
-  //   showCharsCounter: true,
-  //   showWordsCounter: true,
-  //   extraPlugins: [],
-  // };
+  async function Submit() {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", contentRef.current);
+    formData.append("section_id", sectionId);
+    images.forEach((img) => {
+      formData.append("images[]", img);
+    });
+    try {
+
+      const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, formData,{
+        headers: {
+          Accept: "application/json",
+        },
+        // title: title,
+        // content: contentRef.current,
+        // section_id: sectionId
+      });
+      console.log("Yes !");
+      nav('/')
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const config = {
-    readonly: false,
     toolbar: [
-        "bold",
-        "italic",
-        "underline",
-        "|",
-        "ul",
-        "ol",
-        "|",
-        "font",
-        "fontsize",
-        "|",
-        "image",
-        "table"
+      ["bold", "italic", "underline", "strikethrough"],
+      ["fontSize", "alignment", "unorderedList", "orderedList"],
     ],
-    disablePlugins: ["Speech Recognize", "Font Family"]
-};
+    showCharsCounter: true,
+    showWordsCounter: true,
+    removeButtons: ['hr', "selectall", "paragraph"],
+    disablePlugins: ["Speech Recognize", "image", "file", "video", "table", "link", "print", "font", "line", "color"],
+  };
 
-  return(
+  return (
     <div className="text-base md:text-xl">
       <Header />
       <div
@@ -114,77 +135,83 @@ export default function AddBlog() {
           <i className="fa-solid fa-door-open"></i>
         </div>
       </div>
-      <div className="container m-auto px-[10px] md:px-[25px] flex flex-col flex-col-reverse md:flex-row my-[15px]">
-        <div className="flex flex-col items-end grow">
-          {/* <span>محتوى المقال</span>
+      <div className="container m-auto px-[10px] md:px-[25px] flex flex-col flex-col-reverse lg:flex-row my-[15px]">
+        <div className="flex flex-col items-end grow overflow-auto">
+          <span className="mb-3">محتوى المقال</span>
+          <div className="w-full">
+            <JoditEditor
+              config={config}
+              value={contentRef.current}
+              onChange={handleEditorChange}
+              />
+          </div>
+        </div>
+        <div className="md:ml-[25px] flex flex-col">
+          <div className="flex flex-col items-end">
+            <span>عنوان المقال</span>
             <div className="flex items-center my-[10px] bg-[#F1F1F1] w-full border-[#AEAEAE] rounded-[15px]">
               <input
                 style={{ direction }}
                 onBlur={handleBlur}
                 name="title"
-                value={content}
+                value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
                   handleTextDirection(e);
                 }}
                 className="w-full bg-transparent focus:outline-none focus:border-[#61A3FF] border-[2px] rounded-[15px] py-[10px] px-[20px] border-[#AEAEAE]"
               />
-            </div> */}
-              <JoditEditor
-                config={config}
-                value={content}
-                onChange={(newContent)=> setContent(newContent)}
-              />
-        </div>
-        <div className="md:ml-[25px]">
-          <div className="flex flex-col items-end grow">
-            <span>عنوان المقال</span>
-            <div className="flex items-center my-[10px] bg-[#F1F1F1] w-full border-[#AEAEAE] rounded-[15px]">
-              <input
-                style={{ direction }}
-                // onBlur={handleBlur}
-                name="title"
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                  // handleTextDirection(e);
-                }}
-                className="w-full bg-transparent focus:outline-none focus:border-[#61A3FF] border-[2px] rounded-[15px] py-[10px] px-[20px] border-[#AEAEAE]"
-              />
             </div>
           </div>
-          <div>
-          <div className="flex flex-col items-end grow">
-            <span>(اختياري) اختر صورة المقال</span>
-            <div
-              onDragEnter={handleDrag}
-              onDragOver={handleDrag}
-              onDragLeave={handleDrag}
-              onClick={handleImageClick}
-              onDrop={handleDrop}
-              className="relative flex items-center justify-center my-[10px] bg-[#F1F1F1] w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
-            >
-              <input
-                ref={inputImageRef}
-                hidden
-                type="file"
-                onChange={(e) => setImages([...e.target.files])}
-                multiple
-              />
-              <div className="flex flex-col items-center">
-                <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
-                <p className="text-[12px] md:text-[14px]">
-                  <span className="hidden md:inline-block">
-                    أو اسحبها هنا
-                  </span>{" "}
-                  اختر الصورة{" "}
-                </p>
+            <div className="flex flex-col items-end grow my-[15px] grow">
+              <span>(اختياري) اختر صورة المقال</span>
+              <div
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onClick={handleImageClick}
+                onDrop={handleDrop}
+                className="grow relative flex items-center justify-center my-[10px] bg-[#F1F1F1] w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
+              >
+                <input
+                  ref={inputImageRef}
+                  hidden
+                  type="file"
+                  onChange={(e) => setImages([...e.target.files])}
+                  multiple
+                />
+                <div className="flex flex-col items-center">
+                  <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
+                  <p className="text-[12px] md:text-[14px]">
+                    <span className="hidden md:inline-block">
+                      أو اسحبها هنا
+                    </span>{" "}
+                    اختر الصورة{" "}
+                  </p>
+                </div>
+                {imagesShow}
               </div>
-              {imagesShow}
             </div>
-          </div>
-          </div>
         </div>
+      </div>
+      <div className="container m-auto px-[10px] md:px-[25px] flex items-start mb-[20px]">
+        <Button
+            className="bg-green-600
+              text-white
+              w-[100px]
+              h-[40px]
+              md:w-[282px]
+              md:h-[65px]
+              rounded-[10px]
+              hover:text-black
+              hover:bg-transparent
+              hover:border-green-600
+              duration-300
+              border-2
+              border-green-600"
+              onClick={Submit}
+              label= "إضافة"
+          />
       </div>
     </div>
   );

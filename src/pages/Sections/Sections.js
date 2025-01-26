@@ -3,24 +3,19 @@ import Header from "../../components/Header/Header";
 import "./Sections.css";
 import axios from "axios";
 import BASE_URL from "../../config";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import Button from "../../components/Button/Button";
 
 export default function Sections() {
   // useState
   const [doorModelState, setDoorModelState] = useState(false);
   const [editDoorModelState, setEditDoorModelState] = useState(false);
-  const [articleModelState, setArticleModelState] = useState(false);
   const [direction, setDirection] = useState("rtl");
-  const [images, setImages] = useState([]);
-  const [dragActive, setDragActive] = useState(false);
   const [sections, setSections] = useState([]);
   const [refreshPage, setRefreshPage] = useState(1);
 
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
 
   const [sectionId, setSectionId] = useState(0);
 
@@ -29,7 +24,7 @@ export default function Sections() {
 
   // useEffect
   useEffect(() => {
-    if (doorModelState || editDoorModelState || articleModelState) {
+    if (doorModelState || editDoorModelState) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -37,11 +32,11 @@ export default function Sections() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [doorModelState, editDoorModelState, articleModelState]);
+  }, [doorModelState, editDoorModelState]);
 
   useEffect(() => {
     axios
-      .get("https://199.192.19.220/api/v1/sections", {
+      .get("http://199.192.19.220:8080/api/v1/sections", {
         headers: {
           Accept: "application/json",
         },
@@ -105,7 +100,7 @@ export default function Sections() {
         <button
           onClick={() => {
             setSectionId(section.id);
-            handleArticleModelState();
+            nav(`/addBlog?section_id=${section.id}`);
           }}
           className="bg-[#3FAB21]
           border-2
@@ -125,18 +120,6 @@ export default function Sections() {
     </div>
   ));
 
-  // useRef
-  const inputImageRef = useRef(null);
-
-  // Mapping
-  const imagesShow = images.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[10px] h-full w-full"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
-
   // Functions
   function handleDoorModelState() {
     setDoorModelState(!doorModelState);
@@ -150,13 +133,6 @@ export default function Sections() {
     setAbout("");
   }
 
-  function handleArticleModelState() {
-    setArticleModelState(!articleModelState);
-    setImages([]);
-    setTitle("");
-    setContent("");
-  }
-
   const handleTextDirection = (e) => {
     const value = e.target.value;
     if (/[\u0600-\u06FF]/.test(value)) {
@@ -168,32 +144,6 @@ export default function Sections() {
 
   const handleBlur = () => {
     setDirection("rtl");
-  };
-
-  const handleImageClick = () => {
-    if (inputImageRef.current) {
-      inputImageRef.current.click();
-    }
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setImages([...images, ...e.dataTransfer.files]); // تحديث الملفات
-      e.dataTransfer.clearData();
-    }
   };
 
   // Communicating With Backend
@@ -212,7 +162,7 @@ export default function Sections() {
 
   async function Submit() {
     try {
-      const res = await axios.post(`${BASE_URL}/sections`, {
+      const res = await axios.post(`http://199.192.19.220:8080/api/v1/sections`, {
         headers: {
           Accept: "application/json",
         },
@@ -221,24 +171,6 @@ export default function Sections() {
       });
       console.log("Yes !");
       setDoorModelState(false);
-      setRefreshPage((prev) => prev + 1);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function addBlog() {
-    try {
-      const res = await axios.post(`${BASE_URL}/blogs`, {
-        headers: {
-          Accept: "application/json",
-        },
-        title: title,
-        content: content,
-        section_id: sectionId,
-      });
-      console.log("Yes !");
-      setArticleModelState(false);
       setRefreshPage((prev) => prev + 1);
     } catch (error) {
       console.log(error);
@@ -354,27 +286,24 @@ export default function Sections() {
               />
             </div>
             <div className="flex justify-between mt-[15px]">
-              <button
+              <Button className="bg-green-600
+                text-white
+                w-[100px]
+                h-[40px]
+                md:w-[282px]
+                md:h-[65px]
+                rounded-[10px]
+                hover:text-black
+                hover:bg-transparent
+                hover:border-green-600
+                duration-300
+                border-2
+                border-green-600"
+                label="إضافة"
                 onClick={() => {
                   handleDoorModelState();
                   Submit();
-                }}
-                className="bg-green-600
-              text-white
-              w-[100px]
-              h-[40px]
-              md:w-[282px]
-              md:h-[65px]
-              rounded-[10px]
-              hover:text-black
-              hover:bg-transparent
-              hover:border-green-600
-              duration-300
-              border-2
-              border-green-600"
-              >
-                إضافة
-              </button>
+                }}/>
               <button
                 onClick={handleDoorModelState}
                 className="hover:bg-gray-300
@@ -481,118 +410,8 @@ export default function Sections() {
           </div>
         </div>
       )}
-      {/* مودل إضافة مقال لباب */}
-      {articleModelState && (
-        // صندوق إدخال المقال
-        <div
-          className="insert-box
-          px-[15px]
-          inset-0
-          bg-black
-          bg-opacity-25
-          flex
-          items-center
-          justify-center
-          fixed
-          z-50
-          px-[25px]"
-        >
-          <div
-            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-            className="bg-white text-base md:text-xl w-full flex flex-col p-[20px] md:w-[700px] text-right"
-          >
-            <div className="flex flex-col">
-              <span>(اختياري) اختر صورة المقال</span>
-              <div
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onClick={handleImageClick}
-                onDrop={handleDrop}
-                className="relative flex items-center justify-center my-[10px] bg-[#F1F1F1] w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
-              >
-                <input
-                  ref={inputImageRef}
-                  hidden
-                  type="file"
-                  onChange={(e) => setImages([...e.target.files])}
-                  multiple
-                />
-                <div className="flex flex-col items-center">
-                  <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
-                  <p className="text-[12px] md:text-[14px]">
-                    <span className="hidden md:inline-block">
-                      أو اسحبها هنا
-                    </span>{" "}
-                    اختر الصورة{" "}
-                  </p>
-                </div>
-                {imagesShow}
-              </div>
-              <span>عنوان المقال</span>
-              <div className="flex items-center my-[10px] bg-[#F1F1F1] w-full border-[#AEAEAE] rounded-[15px]">
-                <input
-                  style={{ direction }}
-                  onBlur={handleBlur}
-                  name="title"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    handleTextDirection(e);
-                  }}
-                  className="w-full bg-transparent focus:outline-none focus:border-[#61A3FF] border-[2px] rounded-[15px] py-[10px] px-[20px] border-[#AEAEAE]"
-                />
-              </div>
-              <span>محتوى المقال</span>
-              <div className="flex items-center my-[10px] bg-[#F1F1F1] w-full rounded-[15px]">
-                <textarea
-                  className="min-h-[150px] w-full bg-transparent focus:outline-none resize-none py-[10px] px-[20px] border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] rounded-[15px]"
-                  style={{ direction }}
-                  onBlur={handleBlur}
-                  name="content"
-                  value={content}
-                  onChange={(e) => {
-                    setContent(e.target.value);
-                    handleTextDirection(e);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="flex justify-between mt-[15px]">
-              <button
-                onClick={addBlog}
-                className="bg-green-600
-              text-white
-              w-[100px]
-              h-[40px]
-              md:w-[282px]
-              md:h-[65px]
-              rounded-[10px]
-              hover:text-black
-              hover:bg-transparent
-              hover:border-green-600
-              duration-300
-              border-2
-              border-green-600"
-              >
-                إضافة
-              </button>
-              <button
-                onClick={handleArticleModelState}
-                className="hover:bg-gray-300
-              rounded-[10px]
-              duration-300
-              px-[30px]
-              py-[3px]"
-              >
-                رجوع
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-      <div className="articles-content container px-[25px] m-auto">
+      <div className="articles-content container px-[25px] m-auto mb-[20px]">
         {/* صندوق الباب وتفاصيله */}
         {showBlogs}
         <div className="door-box cursor-pointer flex flex-col justify-between">

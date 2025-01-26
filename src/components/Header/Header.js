@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/logowithbg.jpg";
-import "./Header.css";
+import logo from "../../assets/newLogo.png";
 import { useState } from "react";
 export default function Header() {
   const [isOpened, setIsOpened] = useState(false);
