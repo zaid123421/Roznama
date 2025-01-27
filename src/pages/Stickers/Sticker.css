@@ -1,0 +1,16 @@
+.stickers-container{
+  display: grid;
+  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  direction: rtl;
+}
+
+@media (max-width: 768px) {
+  .stickers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  }
+  .list-box{
+    margin-bottom: 10px;
+  }
+}

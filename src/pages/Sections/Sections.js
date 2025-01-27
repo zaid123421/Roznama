@@ -36,7 +36,7 @@ export default function Sections() {
 
   useEffect(() => {
     axios
-      .get("http://199.192.19.220:8080/api/v1/sections", {
+      .get("http://199.192.19.220:8080/api/v1/sections?perPage=75", {
         headers: {
           Accept: "application/json",
         },
@@ -169,9 +169,11 @@ export default function Sections() {
         name: name,
         about: about,
       });
-      console.log("Yes !");
-      setDoorModelState(false);
-      setRefreshPage((prev) => prev + 1);
+      if(res.status === 201) {
+        console.log("Yes !");
+        handleDoorModelState();
+        setRefreshPage((prev) => prev + 1);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -247,14 +249,14 @@ export default function Sections() {
         >
           <div
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl"
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
             <p className="flex justify-end pb-[10px] font-bold">إضافة باب</p>
             <div className="flex flex-col ">
               <span className="flex justify-end mb-[5px]">اسم الباب</span>
               <input
                 autoFocus
-                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px]  ${
+                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
                   direction === "rtl" ? "text-right" : "text-left"
                 }`}
                 style={{ direction }}
@@ -300,20 +302,17 @@ export default function Sections() {
                 border-2
                 border-green-600"
                 label="إضافة"
-                onClick={() => {
-                  handleDoorModelState();
-                  Submit();
-                }}/>
-              <button
-                onClick={handleDoorModelState}
+                onClick={Submit}
+                icon = "true"
+                />
+              <Button onClick={handleDoorModelState}
                 className="hover:bg-gray-300
               rounded-[10px]
               duration-300
               px-[30px]
               py-[3px]"
-              >
-                رجوع
-              </button>
+              label= "رجوع"
+              />
             </div>
           </div>
         </div>
@@ -336,7 +335,7 @@ export default function Sections() {
         >
           <div
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl"
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
             <p className="flex justify-end pb-[10px] font-bold">تعديل الباب</p>
             <div className="flex flex-col ">
@@ -414,7 +413,7 @@ export default function Sections() {
       <div className="articles-content container px-[25px] m-auto mb-[20px]">
         {/* صندوق الباب وتفاصيله */}
         {showBlogs}
-        <div className="door-box cursor-pointer flex flex-col justify-between">
+      {/* <div className="door-box cursor-pointer flex flex-col justify-between">
       <div>
         <span className="font-bold">باب التفسير</span>
         <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
@@ -479,7 +478,7 @@ export default function Sections() {
           إضافة مقال
         </button>
       </div>
-    </div>
+    </div> */}
       </div>
     </div>
   );

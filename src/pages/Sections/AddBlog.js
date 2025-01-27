@@ -22,8 +22,6 @@ export default function AddBlog() {
   const params = new URLSearchParams(location.search);
   const sectionId = params.get('section_id');
 
-  console.log(sectionId); 
-
   // Mapping
   const imagesShow = images.map((img, key) => (
     <img
@@ -85,20 +83,16 @@ export default function AddBlog() {
       formData.append("images[]", img);
     });
     try {
-
-      const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, formData,{
-        headers: {
-          Accept: "application/json",
-        },
-        // title: title,
-        // content: contentRef.current,
-        // section_id: sectionId
-      });
-      console.log("Yes !");
-      nav('/')
-    } catch (error) {
-      console.log(error);
-    }
+  const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, formData,{
+    headers: {
+      Accept: "application/json",
+    },
+    });
+    console.log("Yes !");
+    nav('/')
+  } catch (error) {
+    console.log(error);
+  }
   }
 
   const config = {
@@ -211,6 +205,7 @@ export default function AddBlog() {
               border-green-600"
               onClick={Submit}
               label= "إضافة"
+              icon = "true"
           />
       </div>
     </div>
