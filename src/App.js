@@ -6,6 +6,7 @@ import Section from "./pages/Sections/Section";
 import AddBlog from "./pages/Sections/AddBlog";
 
 import "../src/pages/Sections/Editor.css"
+import ListInfo from "./pages/Stickers/ListInfo";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/section" element={<Section />} />
         <Route path="/AddBlog" element={<AddBlog />} />
         <Route path="/stickers" element={<Stickers />} />
+        <Route path="/listinfo" element={<ListInfo />} />
         <Route path="/tips" element={<Tips />} />
       </Routes>
     </div>

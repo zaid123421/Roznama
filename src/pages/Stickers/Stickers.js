@@ -7,6 +7,7 @@ import ab2 from "../../assets/2.jpeg"
 import ab3 from "../../assets/3.jpeg"
 import ab4 from "../../assets/4.jpeg"
 import "./Sticker.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Stickers() {
   const [listModel, setListModel] = useState(false);
@@ -23,10 +24,7 @@ export default function Stickers() {
 
   const inputImageRef = useRef(null);
 
-  function handleEditListModel() {
-    setName("");
-    setEditListModel(!editListModel);
-  }
+  const nav = useNavigate();
 
   // Mapping
   const imagesShow = images.map((img, key) => (
@@ -54,22 +52,10 @@ export default function Stickers() {
         headers: {
           Accept: "application/json",
         },
-        perPage: 50,
       })
       .then((data) => setLists(data.data.data))
       .catch((err) => console.log(err));
   }, [refreshPage]);
-
-  function handleListModel() {
-    setListModel(!listModel);
-    setName("");
-  }
-
-  function handleStickerModel(name) {
-    setAddStickerModel(!addStickerModel);
-    setListName(name);
-    setImages([]);
-  }
 
   const handleTextDirection = (e) => {
     const value = e.target.value;
@@ -109,6 +95,22 @@ export default function Stickers() {
       e.dataTransfer.clearData();
     }
   };
+
+  function handleListModel() {
+    setListModel(!listModel);
+    setName("");
+  }
+
+  function handleStickerModel(name) {
+    setAddStickerModel(!addStickerModel);
+    setListName(name);
+    setImages([]);
+  }
+
+  function handleEditListModel() {
+    setName("");
+    setEditListModel(!editListModel);
+  }
 
   async function Submit() {
     try {
@@ -152,7 +154,8 @@ export default function Stickers() {
     }
   }
 
-  async function handleDeleteList(id) {
+  async function handleDeleteList(id, e) {
+    e.preventDefault();
     try {
       const res = await axios.delete(
         `http://199.192.19.220:8080/api/v1/categories/${id}`,
@@ -192,9 +195,14 @@ export default function Stickers() {
   }
   }
 
+  function listClick(id) {
+    nav(`/listinfo?listinfo_id=${id}`);
+  }
+
   const showLists = lists.map((list, index) => (
     <div
-      className="list-box grid grid-cols-2 grid-rows-2 relative md:h-[350px] bg-gradient-to-t"
+      onClick={(e) => listClick(list.id, e)}
+      className="list-box cursor-pointer grid grid-cols-2 relative bg-gradient-to-t"
       style={{
         background: "linear-gradient(to bottom, rgba(10,0,37,0.5), rgba(32,32,32,0.2))"
       }}
@@ -202,10 +210,26 @@ export default function Stickers() {
       <span className="text-white font-black absolute z-50 top-[25px] right-[20px]">
         {list.name}
       </span>
-        <div className="relative z-[-1] bg-contain max-h-1/2"><img className="w-full h-full" src={ab1}></img></div>
-        <div className="relative z-[-1] bg-contain max-h-1/2"><img className="w-full h-full" src={ab2}></img></div>
-        <div className="relative z-[-1] bg-contain max-h-1/2"><img className="w-full h-full" src={ab3}></img></div>
-        <div className="relative z-[-1] bg-cover max-h-1/2"><img className="w-full h-full" src={ab4}></img></div>
+        <div className="relative z-[-1] bg-contain max-w-full max-h-1/2">
+          {
+            list.stickers.length > 0 ? <img alt="picture1" className="w-full h-full" src={list.stickers[0].url}/> : ""
+          }
+        </div>
+        <div className="relative z-[-1] bg-contain max-w-full max-h-1/2">
+          {
+            list.stickers.length > 1 ? <img alt="picture2" className="w-full h-full" src={list.stickers[1].url}/> : ""
+          }
+        </div>
+        <div className="relative z-[-1] bg-contain max-w-full max-h-1/2">
+          {
+            list.stickers.length > 2 ? <img alt="picture3" className="w-full h-full" src={list.stickers[2].url}/> : ""
+          }
+        </div>
+        <div className="relative z-[-1] bg-cover max-w-full max-h-1/2">
+          {
+            list.stickers.length > 3 ? <img alt="picture4" className="w-full h-full" src={list.stickers[3].url}/> : ""
+          }
+        </div>
       <div className="w-full absolute bottom-0 left-0 flex flex-row-reverse items-center px-[15px] pb-[15px] justify-between">
         <Button
           className="
@@ -227,17 +251,19 @@ export default function Stickers() {
         justify-center
         flex-row-reverse"
           label="إضافة ملصق"
-          onClick={() => {
-            handleStickerModel(list.name)
-            setCategoryId(list.id)
+          onClick={(e) => {
+            handleStickerModel(list.name);
+            setCategoryId(list.id);
+            e.stopPropagation();
           }}
           icon="true"
         />
         <div>
           <i
-            onClick={() => {
+            onClick={(e) => {
               setCategoryId(list.id);
               handleEditListModel();
+              e.stopPropagation();
             }}
             className="fa-solid
             fa-wand-magic
@@ -256,7 +282,7 @@ export default function Stickers() {
             hover:bg-slate-200"
           />
           <i
-            onClick={() => handleDeleteList(list.id)}
+            onClick={(e) => {handleDeleteList(list.id, e); e.stopPropagation();}}
             className="fa-solid
             fa-trash
             w-[30px]
@@ -282,7 +308,7 @@ export default function Stickers() {
   return (
     <div className="text-base md:text-xl">
       <Header />
-      {/* صندوق مدخل إلى النصائح */}
+      {/* صندوق مدخل إلى الملصقات */}
       <div
         className="introduction-box
         text-base
@@ -356,7 +382,7 @@ export default function Stickers() {
               <Button
                 className="bg-green-600
                 text-white
-                w-[100px]
+                w-[120px]
                 h-[40px]
                 md:w-[282px]
                 md:h-[65px]
@@ -392,7 +418,7 @@ export default function Stickers() {
           </p>
         </div>
       ) : (
-        <div className="stickers-container container m-auto px-[10px] md:px-[25px] my-[25px]">
+        <div className="lists-container container m-auto px-[10px] md:px-[25px] my-[25px]">
           {showLists}
         </div>
       )}

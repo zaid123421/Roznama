@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/newLogo.png";
+import logo from "../../assets/lastlogo.png";
 import { useState } from "react";
 export default function Header() {
   const [isOpened, setIsOpened] = useState(false);
@@ -50,7 +50,8 @@ export default function Header() {
             border-solid
             border-2
             border-green-500
-            md:rounded-xl"
+            md:rounded-xl
+            z-[100]"
           >
             <li className="text-green-500 duration-300 text-lg text-center mt-[5px]">
               <NavLink

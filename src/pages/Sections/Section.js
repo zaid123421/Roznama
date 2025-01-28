@@ -36,7 +36,6 @@ export default function Section() {
   ));
 
   // Handling
-
   function handleModelState() {
     setIsModelOpen(!isModelOpen);
     setImages([]);
