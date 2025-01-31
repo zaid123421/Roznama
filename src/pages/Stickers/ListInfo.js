@@ -3,6 +3,7 @@ import Button from "../../components/Button/Button";
 import Header from "../../components/Header/Header";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import BASE_URL from "../../config";
 
 export default function ListInfo() {
   const [listName, setListName] = useState('');
@@ -11,7 +12,6 @@ export default function ListInfo() {
   const [addStickerModel, setAddStickerModel] = useState(false);
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
-
 
     const inputImageRef = useRef(null);
 
@@ -62,7 +62,7 @@ export default function ListInfo() {
       formData.append("sticker", img);
     });
     try {
-  const res = await axios.post(`http://199.192.19.220:8080/api/v1/stickers`, formData,{
+  const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
     },
@@ -82,7 +82,7 @@ export default function ListInfo() {
 
   useEffect(() => {
     axios
-      .get(`http://199.192.19.220:8080/api/v1/categories/${listId}`, {
+      .get(`${BASE_URL}/categories/${listId}`, {
         headers: {
           Accept: "application/json",
         },

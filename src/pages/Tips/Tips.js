@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/Header/Header";
 import axios from "axios";
+import BASE_URL from "../../config";
 
 export default function Tips() {
 
@@ -8,7 +9,7 @@ export default function Tips() {
   const [advices, setAdvices] = useState([]);
 
   useEffect(() => {
-    axios.get("http://199.192.19.220:8080/api/v1/advice", {
+    axios.get(`${BASE_URL}/advice`, {
       headers: {
         Accept: "application/json"
       },
@@ -21,7 +22,7 @@ export default function Tips() {
 
   async function handleDeleteTip(id) {
     try{
-      let res = await axios.delete(`http://199.192.19.220:8080/api/v1/advice/${id}`, {
+      let res = await axios.delete(`${BASE_URL}/advice/${id}`, {
         headers: {
           Accept: "application/json"
         },

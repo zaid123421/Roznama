@@ -4,6 +4,7 @@ import JoditEditor from "jodit-react";
 import Button from "../../components/Button/Button";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import BASE_URL from "../../config";
 
 export default function AddBlog() {
   const [images, setImages] = useState([]);
@@ -83,7 +84,7 @@ export default function AddBlog() {
       formData.append("images[]", img);
     });
     try {
-  const res = await axios.post(`http://199.192.19.220:8080/api/v1/blogs`, formData,{
+  const res = await axios.post(`${BASE_URL}/blogs`, formData,{
     headers: {
       Accept: "application/json",
     },
@@ -98,12 +99,12 @@ export default function AddBlog() {
   const config = {
     toolbar: [
       ["bold", "italic", "underline", "strikethrough"],
-      ["fontSize", "alignment", "unorderedList", "orderedList"],
+      ["fontSize", "alignment", "unorderedList", "orderedList", "size"],
     ],
     showCharsCounter: true,
     showWordsCounter: true,
     removeButtons: ['hr', "selectall", "paragraph"],
-    disablePlugins: ["Speech Recognize", "image", "file", "video", "table", "link", "print", "font", "line", "color"],
+    disablePlugins: ["Speech Recognize", "image", "file", "video", "table", "link", "print", "line", "color"],
   };
 
   return (

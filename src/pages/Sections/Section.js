@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, DragEvent } from "react";
 import Header from "../../components/Header/Header";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 export default function Section() {
   // useState
@@ -9,6 +11,12 @@ export default function Section() {
   const [file, setFile] = useState();
   const [fileName, setFileName] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [doorInfo, setDoorInfo] = useState(null);
+  const [refreshPage, setRefreshPage] = useState(0);
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const doorId = params.get('doorinfo_id');
 
   // useEffect
   useEffect(() => {
@@ -21,6 +29,19 @@ export default function Section() {
       document.body.style.overflow = "auto";
     };
   }, [isModelOpen]);
+
+  useEffect(() => {
+    axios
+      .get(`http://199.192.19.220:8080/api/v1/blogs`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((data) => {setDoorInfo(data.data.data)})
+      .catch((err) => console.log(err));
+  }, [refreshPage]);
+
+  console.log(doorInfo);
 
   // useRef
   const inputImageRef = useRef(null);
@@ -96,6 +117,15 @@ export default function Section() {
     }
   };
 
+  const showDoor = Array.isArray(doorInfo) && doorInfo.length > 0 ? doorInfo.map((door, index) => (
+    <tr className="border-2 border-[#AEAEAE]" key={index}>
+      <td className="text-center p-[10px]">{(door.created_at).slice(0, 10)}</td>
+      <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
+        {door.title}
+      </td>
+    </tr>
+  )) : null;
+
   return (
     <div className="text-base md:text-xl">
       <Header />
@@ -115,7 +145,7 @@ export default function Section() {
         border-b-black
         py-[15px]"
       >
-        <button
+        {/* <button
           onClick={handleModelState}
           className="
           border-2
@@ -138,13 +168,13 @@ export default function Section() {
         >
           إضافة مقال
           <i className="fa-solid fa-plus ml-[10px]" />
-        </button>
+        </button> */}
         <div className="ml-[20px] md:ml-[50px]">
           <span className="font-semibold mr-[10px]">باب التفسير</span>
           <i className="fa-solid fa-door-open"></i>
         </div>
       </div>
-      {isModelOpen && (
+      {/* {isModelOpen && (
         // صندوق إدخال المقال
         <div
           className="insert-box
@@ -252,137 +282,24 @@ export default function Section() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       {/* صندوق محتوى الصفحة والجدول */}
       <div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="text-[#535763]">
               <th className="w-1/4 p-[10px]">التاريخ</th>
-              <th className="w-1/4 p-[10px]">الحجم</th>
               <th className="w-1/2 p-[10px] text-end">الاسم</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-2 border-[#AEAEAE]">
+            {/* <tr className="border-2 border-[#AEAEAE]">
               <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
               <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
                 تفسير سورة الفتح
               </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة البقرة
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                ما المقصود من ذكر النبي بلفظ عب
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">2025/1/1</td>
-              <td className="text-center p-[10px]">5 KB</td>
-              <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-                تفسير سورة الفتح
-              </td>
-            </tr>
+            </tr> */}
+            {showDoor}
           </tbody>
         </table>
       </div>

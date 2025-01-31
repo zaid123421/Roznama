@@ -36,7 +36,7 @@ export default function Sections() {
 
   useEffect(() => {
     axios
-      .get("http://199.192.19.220:8080/api/v1/sections?perPage=75", {
+      .get(`${BASE_URL}/sections?perPage=75`, {
         headers: {
           Accept: "application/json",
         },
@@ -45,9 +45,14 @@ export default function Sections() {
       .catch((err) => console.log(err));
   }, [refreshPage]);
 
+  function doorClick(id) {
+    nav(`/door?doorinfo_id=${id}`);
+  }
+
   // Show Blogs
   const showBlogs = sections.map((section, index) => (
-    <div className="door-box cursor-pointer flex flex-col justify-between">
+    <div onClick={(e) => doorClick(section.id, e)}
+      className="door-box cursor-pointer flex flex-col justify-between">
       <div>
         <span className="font-bold">{section.name}</span>
         <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
@@ -57,9 +62,10 @@ export default function Sections() {
       <div className="flex justify-between mt-[15px]">
         <div>
           <i
-            onClick={() => {
+            onClick={(e) => {
               setSectionId(section.id);
               handleEditDoorModelState();
+              e.stopPropagation();
             }}
             className="fa-solid
             fa-wand-magic
@@ -78,7 +84,10 @@ export default function Sections() {
             hover:bg-slate-200"
           />
           <i
-            onClick={() => handleDeleteDoor(section.id)}
+            onClick={(e) => {
+              handleDeleteDoor(section.id);
+              e.stopPropagation();
+            }}
             className="fa-solid
             fa-trash
             w-[30px]
@@ -98,8 +107,9 @@ export default function Sections() {
           />
         </div>
         <button
-          onClick={() => {
+          onClick={(e) => {
             setSectionId(section.id);
+            e.stopPropagation();
             nav(`/addBlog?section_id=${section.id}`);
           }}
           className="bg-[#3FAB21]
@@ -162,7 +172,7 @@ export default function Sections() {
 
   async function Submit() {
     try {
-      const res = await axios.post(`http://199.192.19.220:8080/api/v1/sections`, {
+      const res = await axios.post(`${BASE_URL}/sections`, {
         headers: {
           Accept: "application/json",
         },

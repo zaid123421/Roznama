@@ -2,12 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
 import Button from "../../components/Button/Button";
 import axios from "axios";
-import ab1 from "../../assets/1.jpeg"
-import ab2 from "../../assets/2.jpeg"
-import ab3 from "../../assets/3.jpeg"
-import ab4 from "../../assets/4.jpeg"
 import "./Sticker.css";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../config";
 
 export default function Stickers() {
   const [listModel, setListModel] = useState(false);
@@ -48,7 +45,7 @@ export default function Stickers() {
 
   useEffect(() => {
     axios
-      .get("http://199.192.19.220:8080/api/v1/categories?perPage=75", {
+      .get(`${BASE_URL}/categories?perPage=75`, {
         headers: {
           Accept: "application/json",
         },
@@ -115,7 +112,7 @@ export default function Stickers() {
   async function Submit() {
     try {
       const res = await axios.post(
-        `http://199.192.19.220:8080/api/v1/categories`,
+        `${BASE_URL}/categories`,
         {
           headers: {
             Accept: "application/json",
@@ -136,7 +133,7 @@ export default function Stickers() {
   async function Edit() {
     try {
       const res = await axios.put(
-        `http://199.192.19.220:8080/api/v1/categories/${categoryId}`,
+        `${BASE_URL}/categories/${categoryId}`,
         {
           headers: {
             Accept: "application/json",
@@ -158,7 +155,7 @@ export default function Stickers() {
     e.preventDefault();
     try {
       const res = await axios.delete(
-        `http://199.192.19.220:8080/api/v1/categories/${id}`,
+        `${BASE_URL}/categories/${id}`,
         {
           headers: {
             Accept: "application/json",
@@ -181,7 +178,7 @@ export default function Stickers() {
       formData.append("sticker", img);
     });
     try {
-  const res = await axios.post(`http://199.192.19.220:8080/api/v1/stickers`, formData,{
+  const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
     },
