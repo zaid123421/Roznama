@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "../../components/Button/Button";
 import Header from "../../components/Header/Header";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "../../config";
 
@@ -13,7 +13,9 @@ export default function ListInfo() {
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
 
-    const inputImageRef = useRef(null);
+  const nav = useNavigate();
+
+  const inputImageRef = useRef(null);
 
   // Mapping
   const imagesShow = images.map((img, key) => (
@@ -76,6 +78,10 @@ export default function ListInfo() {
   }
   }
 
+  function handleBack() {
+    nav('/stickers')
+  }
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const listId = params.get('listinfo_id');
@@ -119,10 +125,21 @@ export default function ListInfo() {
           label="إضافة ملصق"
           icon="true"
         />
-        <div className="ml-[20px] md:ml-[50px]">
+        <div className="ml-[20px]">
           <span className="font-semibold mr-[10px]">{listName}</span>
           <i className="fa-solid fa-note-sticky"></i>
         </div>
+        <button
+        onClick={handleBack}
+          className="ml-[25px]
+          hover:bg-gray-300
+          rounded-[10px]
+          duration-300
+          px-[10px]
+          py-[5px]">
+          رجوع
+          <i className="fa-solid fa-chevron-right text-[10px] md:text-[15px] ml-[5px] md:ml-[10px]"></i>
+        </button>
       </div>
       <div className="stickers-container container">
       {

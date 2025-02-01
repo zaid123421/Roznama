@@ -332,7 +332,7 @@ export default function Stickers() {
           label="إنشاء قائمة"
           icon="true"
         />
-        <div className="ml-[20px] md:ml-[50px]">
+        <div className="ml-[20px]">
           <span className="font-semibold mr-[10px]">الملصقات</span>
           <i className="fa-solid fa-note-sticky"></i>
         </div>

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/lastlogo.png";
 import { useState } from "react";
-export default function Header() {
+export default function Header({onSearch}) {
   const [isOpened, setIsOpened] = useState(false);
   const [direction, setDirection] = useState("rtl");
 
@@ -127,7 +127,7 @@ export default function Header() {
               direction === "rtl" ? "text-right" : "text-left"
             }`}
             style={{ direction }}
-            onChange={handleInputChange}
+            onChange={(e) => onSearch(e.target.value)}
             onBlur={handleBlur}
           />
         </div>

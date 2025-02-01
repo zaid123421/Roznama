@@ -12,7 +12,10 @@ export default function Sections() {
   const [editDoorModelState, setEditDoorModelState] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [sections, setSections] = useState([]);
+  const [filteredSections, setFilteredSections] = useState([]);
   const [refreshPage, setRefreshPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
@@ -41,17 +44,34 @@ export default function Sections() {
           Accept: "application/json",
         },
       })
-      .then((data) => setSections(data.data.data))
+      .then((data) => {
+        setSections(data.data.data);
+        setFilteredSections(data.data.data);
+      })
+      
       .catch((err) => console.log(err));
   }, [refreshPage]);
 
-  function doorClick(id) {
-    nav(`/door?doorinfo_id=${id}`);
+  function handleSearch(query) {
+    setSearchQuery(query);
+    if (query.trim() === "") {
+      setFilteredSections(sections);
+    } else {
+      setFilteredSections(
+        sections.filter((section) =>
+          section.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+  }
+
+  function doorClick(id, name) {
+    nav(`/door?section_id=${id}&door_name=${name}`);
   }
 
   // Show Blogs
   const showBlogs = sections.map((section, index) => (
-    <div onClick={(e) => doorClick(section.id, e)}
+    <div onClick={(e) => doorClick(section.id, section.name, e)}
       className="door-box cursor-pointer flex flex-col justify-between">
       <div>
         <span className="font-bold">{section.name}</span>
@@ -208,7 +228,7 @@ export default function Sections() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header />
+      <Header onSearch={handleSearch}/>
       {/* صندوق المدخل إلى الأبواب وزر إمكانية إضافة الباب */}
       <div
         className="introduction-box
@@ -420,76 +440,59 @@ export default function Sections() {
         </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-      <div className="articles-content container px-[25px] m-auto mb-[20px]">
+      {/* <div className="articles-content container px-[25px] m-auto mb-[20px]"> */}
         {/* صندوق الباب وتفاصيله */}
-        {showBlogs}
-      {/* <div className="door-box cursor-pointer flex flex-col justify-between">
-      <div>
-        <span className="font-bold">باب التفسير</span>
-        <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
-          test text
-        </p>
+        {/* {showBlogs} */}
+        <div className="articles-content container px-[25px] m-auto mb-[20px]">
+        {filteredSections.length > 0 ? (
+          filteredSections.map((section, index) => (
+            <div
+              key={section.id}
+              onClick={(e) => doorClick(section.id, section.name, e)}
+              className="door-box cursor-pointer flex flex-col justify-between"
+            >
+              <div>
+                <span className="font-bold">{section.name}</span>
+                <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
+                  {section.about}
+                </p>
+              </div>
+              <div className="flex justify-between mt-[15px]">
+                <div>
+                  <i
+                    onClick={(e) => {
+                      setSectionId(section.id);
+                      handleEditDoorModelState();
+                      e.stopPropagation();
+                    }}
+                    className="fa-solid fa-wand-magic bg-[#F1F1F1] w-[30px] h-[30px] md:w-[40px] md:h-[40px] inline-flex justify-center items-center rounded-md cursor-pointer text-[#535763] duration-300 hover:bg-slate-200"
+                  />
+                  <i
+                    onClick={(e) => {
+                      handleDeleteDoor(section.id);
+                      e.stopPropagation();
+                    }}
+                    className="fa-solid fa-trash w-[30px] h-[30px] md:w-[40px] md:h-[40px] inline-flex justify-center items-center bg-[#F1F1F1] mr-[10px] rounded-md cursor-pointer text-[#BF305E] duration-300 hover:bg-slate-200"
+                  />
+                </div>
+                <button
+                  onClick={(e) => {
+                    setSectionId(section.id);
+                    e.stopPropagation();
+                    nav(`/addBlog?section_id=${section.id}`);
+                  }}
+                  className="bg-[#3FAB21] border-2 border-[#3FAB21] rounded-[10px] px-[8px] md:px-[12px] text-white hover:text-black hover:bg-transparent duration-300"
+                >
+                  <i className="fa-solid fa-plus ml-[10px]" /> إضافة مقال
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا توجد نتائج مطابقة</p>
+        )}
       </div>
-      <div className="flex justify-between mt-[15px]">
-        <div>
-          <i
-            onClick={() => {
-              handleEditDoorModelState();
-            }}
-            className="fa-solid
-            fa-wand-magic
-            bg-[#F1F1F1]
-            w-[30px]
-            h-[30px]
-            md:w-[40px]
-            md:h-[40px]
-            inline-flex
-            justify-center
-            items-center
-            rounded-md
-            cursor-pointer
-            text-[#535763]
-            duration-300
-            hover:bg-slate-200"
-          />
-          <i
-            className="fa-solid
-            fa-trash
-            w-[30px]
-            h-[30px]
-            md:w-[40px]
-            md:h-[40px]
-            inline-flex
-            justify-center
-            items-center
-            bg-[#F1F1F1]
-            mr-[10px]
-            rounded-md
-            cursor-pointer
-            text-[#BF305E]
-            duration-300 
-            hover:bg-slate-200"
-          />
-        </div>
-        <button
-          onClick={() => {nav('./AddBlog')}}
-          className="bg-[#3FAB21]
-          border-2
-          border-[#3FAB21]
-          rounded-[10px]
-          px-[8px]
-          md:px-[12px]
-          text-white
-          hover:text-black
-          hover:bg-transparent
-          duration-300"
-        >
-          <i className="fa-solid fa-plus ml-[10px]" />
-          إضافة مقال
-        </button>
-      </div>
-    </div> */}
-      </div>
+      {/* </div> */}
     </div>
   );
 }
