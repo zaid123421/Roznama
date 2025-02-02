@@ -12,7 +12,7 @@ export default function Sections() {
   const [editDoorModelState, setEditDoorModelState] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [sections, setSections] = useState([]);
-  const [filteredSections, setFilteredSections] = useState([]);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [refreshPage, setRefreshPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -46,23 +46,31 @@ export default function Sections() {
       })
       .then((data) => {
         setSections(data.data.data);
-        setFilteredSections(data.data.data);
       })
-      
       .catch((err) => console.log(err));
   }, [refreshPage]);
 
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredBlogs([]);
+      return;
+    }
+    axios
+      .get(`${BASE_URL}/blogs?title=${searchQuery}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        setFilteredBlogs(response.data.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+      });
+  }, [searchQuery]);
+
   function handleSearch(query) {
     setSearchQuery(query);
-    if (query.trim() === "") {
-      setFilteredSections(sections);
-    } else {
-      setFilteredSections(
-        sections.filter((section) =>
-          section.name.toLowerCase().includes(query.toLowerCase())
-        )
-      );
-    }
   }
 
   function doorClick(id, name) {
@@ -149,6 +157,49 @@ export default function Sections() {
       </div>
     </div>
   ));
+
+  const showSearchResults = filteredBlogs.map((blog, index) => (
+    <tr className="border-2 border-[#AEAEAE]" key={index}>
+    <td className="text-center px-[5px]">
+    <i
+    onClick={() => handleDelete(blog.id)}
+    className="fa-solid
+        fa-trash
+        w-[30px]
+        h-[30px]
+        md:w-[40px]
+        md:h-[40px]
+        inline-flex
+        justify-center
+        items-center
+        bg-[#dbdbdb]
+        mr-[10px]
+        rounded-md
+        cursor-pointer
+        text-[#BF305E]
+        duration-300
+        hover:bg-slate-200"
+      />
+    </td>
+    <td className="text-center p-[10px]">{(blog.created_at).slice(0, 10)}</td>
+    <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
+      {blog.title}
+    </td>
+  </tr>
+  ));
+
+  async function handleDelete(id) {
+    try {
+      const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      setRefreshPage(refreshPage + 1);
+    } catch {
+      console.log("Error");
+    }
+  }
 
   // Functions
   function handleDoorModelState() {
@@ -440,59 +491,26 @@ export default function Sections() {
         </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-      {/* <div className="articles-content container px-[25px] m-auto mb-[20px]"> */}
-        {/* صندوق الباب وتفاصيله */}
-        {/* {showBlogs} */}
-        <div className="articles-content container px-[25px] m-auto mb-[20px]">
-        {filteredSections.length > 0 ? (
-          filteredSections.map((section, index) => (
-            <div
-              key={section.id}
-              onClick={(e) => doorClick(section.id, section.name, e)}
-              className="door-box cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <span className="font-bold">{section.name}</span>
-                <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
-                  {section.about}
-                </p>
-              </div>
-              <div className="flex justify-between mt-[15px]">
-                <div>
-                  <i
-                    onClick={(e) => {
-                      setSectionId(section.id);
-                      handleEditDoorModelState();
-                      e.stopPropagation();
-                    }}
-                    className="fa-solid fa-wand-magic bg-[#F1F1F1] w-[30px] h-[30px] md:w-[40px] md:h-[40px] inline-flex justify-center items-center rounded-md cursor-pointer text-[#535763] duration-300 hover:bg-slate-200"
-                  />
-                  <i
-                    onClick={(e) => {
-                      handleDeleteDoor(section.id);
-                      e.stopPropagation();
-                    }}
-                    className="fa-solid fa-trash w-[30px] h-[30px] md:w-[40px] md:h-[40px] inline-flex justify-center items-center bg-[#F1F1F1] mr-[10px] rounded-md cursor-pointer text-[#BF305E] duration-300 hover:bg-slate-200"
-                  />
-                </div>
-                <button
-                  onClick={(e) => {
-                    setSectionId(section.id);
-                    e.stopPropagation();
-                    nav(`/addBlog?section_id=${section.id}`);
-                  }}
-                  className="bg-[#3FAB21] border-2 border-[#3FAB21] rounded-[10px] px-[8px] md:px-[12px] text-white hover:text-black hover:bg-transparent duration-300"
-                >
-                  <i className="fa-solid fa-plus ml-[10px]" /> إضافة مقال
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا توجد نتائج مطابقة</p>
-        )}
-      </div>
-      {/* </div> */}
+        {
+        searchQuery !== "" && filteredBlogs.length === 0
+        ? <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا يوجد نتائج مطابقة</p>
+        : searchQuery !== "" && filteredBlogs.length !== 0
+        ?<div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-[#535763]">
+                <th className="w-1/4 p-[10px]">حذف</th>
+                <th className="w-1/4 p-[10px]">التاريخ</th>
+                <th className="w-1/2 p-[10px] text-end">الاسم</th>
+              </tr>
+            </thead>
+            <tbody>
+              {showSearchResults}
+            </tbody>
+          </table>
+        </div>
+        : <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
+        }
     </div>
   );
 }
