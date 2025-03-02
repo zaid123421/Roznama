@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
 import "./Sections.css";
 import axios from "axios";
 import BASE_URL from "../../config";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
+import { User } from "../../hooks/Context";
+import Cookies from "universal-cookie";
 
 export default function Sections() {
   // useState
@@ -16,7 +18,6 @@ export default function Sections() {
   const [refreshPage, setRefreshPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
 
@@ -24,6 +25,9 @@ export default function Sections() {
 
   // useNavigate
   const nav = useNavigate();
+
+  // useContext
+  const userInfo = useContext(User);
 
   // useEffect
   useEffect(() => {
@@ -188,19 +192,6 @@ export default function Sections() {
   </tr>
   ));
 
-  async function handleDelete(id) {
-    try {
-      const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      });
-      setRefreshPage(refreshPage + 1);
-    } catch {
-      console.log("Error");
-    }
-  }
-
   // Functions
   function handleDoorModelState() {
     setDoorModelState(!doorModelState);
@@ -228,11 +219,61 @@ export default function Sections() {
   };
 
   // Communicating With Backend
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken")
+
+  async function Submit() {  
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/sections`,
+        {
+          name: name,
+          about: about,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.status === 201) {
+        console.log("Yes !");
+        handleDoorModelState();
+        setRefreshPage((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Error:", error.response ? error.response.data : error.message);
+    }
+  }
+
+  async function Edit() {
+    try {
+      const res = await axios.put(`${BASE_URL}/sections/${sectionId}`, {
+        name: name,
+        about: about,
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+      console.log("Yes !");
+      setEditDoorModelState(false);
+      setRefreshPage((prev) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async function handleDeleteDoor(id) {
     try {
       const res = await axios.delete(`${BASE_URL}/sections/${id}`, {
         headers: {
           Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
       setRefreshPage(refreshPage + 1);
@@ -241,39 +282,18 @@ export default function Sections() {
     }
   }
 
-  async function Submit() {
+  async function handleDelete(id) {
     try {
-      const res = await axios.post(`${BASE_URL}/sections`, {
+      const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
           Accept: "application/json",
+          Authorization: `Bearer ${token}`
         },
-        name: name,
-        about: about,
       });
-      if(res.status === 201) {
-        console.log("Yes !");
-        handleDoorModelState();
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function Edit() {
-    try {
-      const res = await axios.put(`${BASE_URL}/sections/${sectionId}`, {
-        headers: {
-          Accept: "application/json",
-        },
-        name: name,
-        about: about,
-      });
-      console.log("Yes !");
-      setEditDoorModelState(false);
+      setFilteredBlogs((prev) => prev.filter((blog) => blog.id !== id));
       setRefreshPage((prev) => prev + 1);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      console.log("Error");
     }
   }
 
@@ -457,7 +477,6 @@ export default function Sections() {
             <div className="flex justify-between mt-[15px]">
               <button
                 onClick={() => {
-                  handleEditDoorModelState();
                   Edit();
                 }}
                 className="bg-green-600
@@ -491,26 +510,29 @@ export default function Sections() {
         </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-        {
-        searchQuery !== "" && filteredBlogs.length === 0
-        ? <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا يوجد نتائج مطابقة</p>
-        : searchQuery !== "" && filteredBlogs.length !== 0
-        ?<div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-[#535763]">
-                <th className="w-1/4 p-[10px]">حذف</th>
-                <th className="w-1/4 p-[10px]">التاريخ</th>
-                <th className="w-1/2 p-[10px] text-end">الاسم</th>
-              </tr>
-            </thead>
-            <tbody>
-              {showSearchResults}
-            </tbody>
-          </table>
-        </div>
-        : <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
-        }
+      {
+      searchQuery !== "" && filteredBlogs.length === 0
+      ? <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا يوجد نتائج مطابقة</p>
+      : searchQuery !== "" && filteredBlogs.length !== 0
+      ?<div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="text-[#535763]">
+              <th className="w-1/4 p-[10px]">حذف</th>
+              <th className="w-1/4 p-[10px]">التاريخ</th>
+              <th className="w-1/2 p-[10px] text-end">الاسم</th>
+            </tr>
+          </thead>
+          <tbody>
+            {showSearchResults}
+          </tbody>
+        </table>
+      </div>
+      :
+        <>
+          <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
+        </>
+      }
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Button from "../../components/Button/Button";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../config";
+import Cookies from "universal-cookie";
 
 export default function AddBlog() {
   const [images, setImages] = useState([]);
@@ -75,6 +76,9 @@ export default function AddBlog() {
     setDirection("rtl");
   };
 
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
   async function Submit() {
     const formData = new FormData();
     formData.append("title", title);
@@ -84,13 +88,13 @@ export default function AddBlog() {
       formData.append("images[]", img);
     });
     try {
-  const res = await axios.post(`${BASE_URL}/blogs`, formData,{
-    headers: {
-      Accept: "application/json",
-    },
+      const res = await axios.post(`${BASE_URL}/blogs`, formData,{
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
-    console.log("Yes !");
-    nav('/')
+    nav('/sections')
   } catch (error) {
     console.log(error);
   }

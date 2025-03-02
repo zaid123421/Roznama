@@ -4,6 +4,7 @@ import Header from "../../components/Header/Header";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "../../config";
+import Cookies from "universal-cookie";
 
 export default function ListInfo() {
   const [listName, setListName] = useState('');
@@ -57,6 +58,9 @@ export default function ListInfo() {
     }
   };
 
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
   async function addSticker() {
     const formData = new FormData();
     formData.append("category_id", listId)
@@ -67,6 +71,7 @@ export default function ListInfo() {
   const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
     },
     });
     if(res.status === 201) {

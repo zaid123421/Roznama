@@ -2,29 +2,33 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header/Header";
 import axios from "axios";
 import BASE_URL from "../../config";
+import Cookies from "universal-cookie";
 
 export default function Tips() {
 
   const [refreshPage, setRefreshPage] = useState(1);
   const [advices, setAdvices] = useState([]);
 
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
   useEffect(() => {
-    axios.get(`${BASE_URL}/advice`, {
+    axios.get(`${BASE_URL}/advice`,{
       headers: {
-        Accept: "application/json"
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((data) => setAdvices(data.data.data))
     .catch((err) => console.log(err));
   }, [refreshPage])
 
-  console.log(advices);
-
   async function handleDeleteTip(id) {
     try{
       let res = await axios.delete(`${BASE_URL}/advice/${id}`, {
         headers: {
-          Accept: "application/json"
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
       console.log(res);

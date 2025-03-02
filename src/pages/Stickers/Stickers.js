@@ -5,6 +5,7 @@ import axios from "axios";
 import "./Sticker.css";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../../config";
+import Cookies from "universal-cookie";
 
 export default function Stickers() {
   const [listModel, setListModel] = useState(false);
@@ -43,11 +44,15 @@ export default function Stickers() {
     };
   }, [listModel]);
 
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
   useEffect(() => {
     axios
       .get(`${BASE_URL}/categories?perPage=75`, {
         headers: {
           Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((data) => setLists(data.data.data))
@@ -114,10 +119,13 @@ export default function Stickers() {
       const res = await axios.post(
         `${BASE_URL}/categories`,
         {
+          name: name,
+        },
+        {
           headers: {
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          name: name,
         }
       );
       if (res.status === 201) {
@@ -135,10 +143,13 @@ export default function Stickers() {
       const res = await axios.put(
         `${BASE_URL}/categories/${categoryId}`,
         {
+          name: name,
+        },
+        {
           headers: {
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          name: name,
         }
       );
       if (res.status === 200) {
@@ -159,6 +170,7 @@ export default function Stickers() {
         {
           headers: {
             Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -181,6 +193,7 @@ export default function Stickers() {
   const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
+      Authorization: `Bearer ${token}`,
     },
     });
     if(res.status === 201) {

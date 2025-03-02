@@ -75,7 +75,7 @@ export default function Header({onSearch}) {
             </li>
             <li className="text-green-500 duration-300 text-lg text-center mb-[5px]">
               <NavLink
-                to="/"
+                to="/sections"
                 className={({ isActive }) =>
                   isActive ? "text-green-600 font-bold" : ""
                 }
@@ -109,7 +109,7 @@ export default function Header({onSearch}) {
           </li>
           <li className="mr-5 text-2xl hover:text-black duration-300">
             <NavLink
-              to="/"
+              to="/sections"
               className={({ isActive }) =>
                 isActive ? "underline underline-offset-[37px]" : ""
               }

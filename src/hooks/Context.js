@@ -1,13 +1,8 @@
-import React, { createContext, useState } from "react";
+import { createContext, useState } from "react";
 
-export const AppContext = createContext();
+export const User = createContext({});
 
-export const AppProvider = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <AppContext.Provider value={{ isOpen, setIsOpen }}>
-      {children}
-    </AppContext.Provider>
-  );
-};
+export default function UserProvider({children}){
+  const [auth, setAuth] = useState({});
+  return <User.Provider value = {{ auth, setAuth }}>{children}</User.Provider>;
+}

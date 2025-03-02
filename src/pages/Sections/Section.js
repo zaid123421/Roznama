@@ -3,6 +3,7 @@ import Header from "../../components/Header/Header";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "../../config";
+import Cookies from "universal-cookie";
 
 export default function Section() {
   // useState
@@ -48,19 +49,24 @@ export default function Section() {
       });
   }, [searchQuery]);
 
+
   function handleBack() {
-    nav('/')
+    nav('/sections')
   }
 
   function handleSearch(query) {
     setSearchQuery(query);
   }
 
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
   async function handleDelete(id) {
     try {
       const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
           Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
       setRefreshPage(refreshPage + 1);
@@ -195,7 +201,7 @@ export default function Section() {
                 {showDoor}
               </tbody>
             </table>
-          </div>
+        </div>
         }
     </div>
   );
