@@ -19,6 +19,8 @@ export default function Stickers() {
   const [images, setImages] = useState([]);
   const [categoryId, setCategoryId] = useState(0);
   const [editListModel, setEditListModel] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [listId, setListId] = useState(null);
 
   const inputImageRef = useRef(null);
 
@@ -93,7 +95,7 @@ export default function Stickers() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setImages([...images, ...e.dataTransfer.files]); // تحديث الملفات
+      setImages([...images, ...e.dataTransfer.files]);
       e.dataTransfer.clearData();
     }
   };
@@ -162,8 +164,7 @@ export default function Stickers() {
     }
   }
 
-  async function handleDeleteList(id, e) {
-    e.preventDefault();
+  async function handleDeleteList(id) {
     try {
       const res = await axios.delete(
         `${BASE_URL}/categories/${id}`,
@@ -176,6 +177,7 @@ export default function Stickers() {
       );
       if (res.status === 204) {
         console.log("Yes !");
+        setConfirm(false);
         setRefreshPage((prev) => prev + 1);
       }
     } catch (error) {
@@ -205,13 +207,9 @@ export default function Stickers() {
   }
   }
 
-  function listClick(id) {
-    nav(`/listinfo?listinfo_id=${id}`);
-  }
-
   const showLists = lists.map((list, index) => (
     <div
-      onClick={(e) => listClick(list.id, e)}
+      onClick={() => nav(`/listinfo?listinfo_id=${list.id}`)}
       className="list-box cursor-pointer grid grid-cols-2 relative bg-gradient-to-t"
       style={{
         background: "linear-gradient(to bottom, rgba(10,0,37,0.5), rgba(32,32,32,0.2))"
@@ -273,6 +271,7 @@ export default function Stickers() {
             onClick={(e) => {
               setCategoryId(list.id);
               handleEditListModel();
+              setName(list.name)
               e.stopPropagation();
             }}
             className="fa-solid
@@ -292,7 +291,12 @@ export default function Stickers() {
             hover:bg-slate-200"
           />
           <i
-            onClick={(e) => {handleDeleteList(list.id, e); e.stopPropagation();}}
+            onClick={(e) => { 
+              e.stopPropagation();
+              setConfirm(true);
+              setListId(list.id);
+              setListName(list.name);
+            }}
             className="fa-solid
             fa-trash
             w-[30px]
@@ -390,22 +394,21 @@ export default function Stickers() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <Button
-                className="bg-green-600
-                text-white
-                w-[120px]
-                h-[40px]
-                md:w-[282px]
-                md:h-[65px]
-                rounded-[10px]
-                hover:text-black
-                hover:bg-transparent
-                hover:border-green-600
-                duration-300
-                border-2
-                border-green-600"
-                label="إنشاء قائمة"
-                onClick={Submit}
-                icon="ture"
+              className={`w-[100px] h-[40px] md:w-[282px] md:h-[65px] rounded-[10px] 
+                border-2 duration-300 
+                ${
+                  name.length > 4
+                    ? "bg-green-600 text-white hover:text-black hover:bg-transparent border-green-600"
+                    : "bg-gray-400 text-white cursor-not-allowed border-gray-400"
+                }`}
+              label="إضافة"
+              onClick={() => {
+                if (name.length > 4) {
+                  Submit();
+                }
+              }}
+              icon="true"
+              disabled={name.length <= 4}
               />
               <Button
                 onClick={handleListModel}
@@ -515,16 +518,16 @@ export default function Stickers() {
       {editListModel && (
         <div
           className="insert-box
-      px-[15px]
-      inset-0
-      bg-black
-      bg-opacity-25
-      flex
-      items-center
-      justify-center
-      fixed
-      z-50
-      px-[25px]"
+          px-[15px]
+          inset-0
+          bg-black
+          bg-opacity-25
+          flex
+          items-center
+          justify-center
+          fixed
+          z-50
+          px-[25px]"
         >
           <div
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
@@ -581,6 +584,54 @@ export default function Stickers() {
           </div>
         </div>
       )}
+      {confirm &&
+      <div
+        className="insert-box
+        px-[15px]
+        inset-0
+        bg-black
+        bg-opacity-25
+        flex
+        items-center
+        justify-center
+        fixed
+        z-50
+        px-[25px]"
+        >
+          <div
+            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
+          >
+            <p className="text-right">هل تود حقاً حذف <span className="font-bold">{listName}</span> مع الملصقات الخاصة بالقائمة ؟</p>
+            <div className="flex justify-between mt-[50px]">
+              <Button className="bg-green-600
+                text-white
+                w-[100px]
+                h-[40px]
+                md:w-[282px]
+                md:h-[65px]
+                rounded-[10px]
+                hover:text-black
+                hover:bg-transparent
+                hover:border-green-600
+                duration-300
+                border-2
+                border-green-600"
+                label="حذف"
+                onClick={() => handleDeleteList(listId)}
+                />
+              <Button onClick={() => setConfirm(false)}
+                className="hover:bg-gray-300
+              rounded-[10px]
+              duration-300
+              px-[30px]
+              py-[3px]"
+              label= "رجوع"
+              />
+            </div>
+          </div>
+      </div>
+      }
     </div>
   );
 }

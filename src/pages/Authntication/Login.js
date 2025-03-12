@@ -12,7 +12,6 @@ export default function Login() {
   // useState
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [accept, setAccept] = useState(false);
   const [error, setError] = useState(false);
 
   // useContext
@@ -23,7 +22,6 @@ export default function Login() {
 
   async function Submit(e) {
     e.preventDefault();
-    setAccept(true);
     try {
       let res = await axios.post(`${BASE_URL}/auth/login`, {
         username: username,

@@ -23,11 +23,15 @@ export default function Sections() {
 
   const [sectionId, setSectionId] = useState(0);
 
+  const [confirm, setConfirm] = useState(false);
+  const [confirmDoor, setConfirmDoor] = useState(false);
+  const [doorName, setDoorName] = useState("");
+  const [doorId, setDoorId] = useState(null);
+  const [articleName, setArticleName] = useState("");
+  const [articleId, setArticleId] = useState(null);
+
   // useNavigate
   const nav = useNavigate();
-
-  // useContext
-  const userInfo = useContext(User);
 
   // useEffect
   useEffect(() => {
@@ -77,17 +81,13 @@ export default function Sections() {
     setSearchQuery(query);
   }
 
-  function doorClick(id, name) {
-    nav(`/door?section_id=${id}&door_name=${name}`);
-  }
-
   // Show Blogs
   const showBlogs = sections.map((section, index) => (
-    <div onClick={(e) => doorClick(section.id, section.name, e)}
+    <div onClick={(e) => nav(`/door?section_id=${section.id}&door_name=${section.name}`)}
       className="door-box cursor-pointer flex flex-col justify-between">
       <div>
         <span className="font-bold">{section.name}</span>
-        <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] bg-[#C5C5C5] h-fit">
+        <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] h-fit">
           {section.about}
         </p>
       </div>
@@ -95,8 +95,10 @@ export default function Sections() {
         <div>
           <i
             onClick={(e) => {
-              setSectionId(section.id);
               handleEditDoorModelState();
+              setSectionId(section.id);
+              setName(section.name);
+              setAbout(section.about)
               e.stopPropagation();
             }}
             className="fa-solid
@@ -117,7 +119,9 @@ export default function Sections() {
           />
           <i
             onClick={(e) => {
-              handleDeleteDoor(section.id);
+              setDoorId(section.id);
+              setDoorName(section.name)
+              setConfirmDoor(true);
               e.stopPropagation();
             }}
             className="fa-solid
@@ -142,7 +146,7 @@ export default function Sections() {
           onClick={(e) => {
             setSectionId(section.id);
             e.stopPropagation();
-            nav(`/addBlog?section_id=${section.id}`);
+            nav(`/addBlog?section_id=${section.id}&door=${section.name}`);
           }}
           className="bg-[#3FAB21]
           border-2
@@ -166,7 +170,7 @@ export default function Sections() {
     <tr className="border-2 border-[#AEAEAE]" key={index}>
     <td className="text-center px-[5px]">
     <i
-    onClick={() => handleDelete(blog.id)}
+    onClick={() => {setConfirm(true); setArticleName(blog.title); setArticleId(blog.id)}}
     className="fa-solid
         fa-trash
         w-[30px]
@@ -277,6 +281,7 @@ export default function Sections() {
         },
       });
       setRefreshPage(refreshPage + 1);
+      setConfirmDoor(false);
     } catch {
       console.log("Error");
     }
@@ -292,6 +297,7 @@ export default function Sections() {
       });
       setFilteredBlogs((prev) => prev.filter((blog) => blog.id !== id));
       setRefreshPage((prev) => prev + 1);
+      setConfirm(false);
     } catch {
       console.log("Error");
     }
@@ -389,23 +395,23 @@ export default function Sections() {
               />
             </div>
             <div className="flex justify-between mt-[15px]">
-              <Button className="bg-green-600
-                text-white
-                w-[100px]
-                h-[40px]
-                md:w-[282px]
-                md:h-[65px]
-                rounded-[10px]
-                hover:text-black
-                hover:bg-transparent
-                hover:border-green-600
-                duration-300
-                border-2
-                border-green-600"
-                label="إضافة"
-                onClick={Submit}
-                icon = "true"
-                />
+              <Button
+              className={`w-[100px] h-[40px] md:w-[282px] md:h-[65px] rounded-[10px] 
+                border-2 duration-300 
+                ${
+                  name.length > 5 && about.length > 7
+                    ? "bg-green-600 text-white hover:text-black hover:bg-transparent border-green-600"
+                    : "bg-gray-400 text-white cursor-not-allowed border-gray-400"
+                }`}
+              label="إضافة"
+              onClick={() => {
+                if (name.length > 5 && about.length > 7) {
+                  Submit();
+                }
+              }}
+              icon="true"
+              disabled={name.length <= 5 || about.length <= 7}
+              />
               <Button onClick={handleDoorModelState}
                 className="hover:bg-gray-300
               rounded-[10px]
@@ -443,7 +449,7 @@ export default function Sections() {
               <span className="flex justify-end mb-[5px]">اسم الباب</span>
               <input
                 autoFocus
-                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px]  ${
+                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
                   direction === "rtl" ? "text-right" : "text-left"
                 }`}
                 style={{ direction }}
@@ -529,9 +535,105 @@ export default function Sections() {
         </table>
       </div>
       :
-        <>
-          <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
-        </>
+        <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
+      }
+      {/* مودل تأكيد حذف المقال*/}
+      {confirm &&
+      <div
+        className="insert-box
+        px-[15px]
+        inset-0
+        bg-black
+        bg-opacity-25
+        flex
+        items-center
+        justify-center
+        fixed
+        z-50
+        px-[25px]"
+        >
+          <div
+            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
+          >
+            <p className="text-right">هل تود حقاً حذف <span className="font-bold">{articleName}</span></p>
+            <div className="flex justify-between mt-[50px]">
+              <Button className="bg-green-600
+                text-white
+                w-[100px]
+                h-[40px]
+                md:w-[282px]
+                md:h-[65px]
+                rounded-[10px]
+                hover:text-black
+                hover:bg-transparent
+                hover:border-green-600
+                duration-300
+                border-2
+                border-green-600"
+                label="حذف"
+                onClick={() => handleDelete(articleId)}
+                />
+              <Button onClick={() => setConfirm(false)}
+                className="hover:bg-gray-300
+              rounded-[10px]
+              duration-300
+              px-[30px]
+              py-[3px]"
+              label= "رجوع"
+              />
+            </div>
+          </div>
+      </div>
+      }
+      {/* مودل تأكيد حذف الباب*/}
+      {confirmDoor &&
+      <div
+        className="insert-box
+        px-[15px]
+        inset-0
+        bg-black
+        bg-opacity-25
+        flex
+        items-center
+        justify-center
+        fixed
+        z-50
+        px-[25px]"
+        >
+          <div
+            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
+          >
+            <p className="text-right">هل تود حقاً حذف <span className="font-bold">{doorName}</span> مع كل المقالات الخاصة بهذا الباب ؟</p>
+            <div className="flex justify-between mt-[50px]">
+              <Button className="bg-green-600
+                text-white
+                w-[100px]
+                h-[40px]
+                md:w-[282px]
+                md:h-[65px]
+                rounded-[10px]
+                hover:text-black
+                hover:bg-transparent
+                hover:border-green-600
+                duration-300
+                border-2
+                border-green-600"
+                label="حذف"
+                onClick={() => handleDeleteDoor(doorId)}
+                />
+              <Button onClick={() => setConfirmDoor(false)}
+                className="hover:bg-gray-300
+              rounded-[10px]
+              duration-300
+              px-[30px]
+              py-[3px]"
+              label= "رجوع"
+              />
+            </div>
+          </div>
+      </div>
       }
     </div>
   );

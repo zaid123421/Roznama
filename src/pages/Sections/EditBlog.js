@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
 import JoditEditor from "jodit-react";
 import Button from "../../components/Button/Button";
@@ -7,10 +7,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
-export default function AddBlog() {
+export default function EditBlog() {
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [direction, setDirection] = useState("rtl");
+  const [articleInfo, setArticleInfo] = useState([]);
   const [title, setTitle] = useState("");
 
   // useRef
@@ -22,12 +23,22 @@ export default function AddBlog() {
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const sectionId = params.get('section_id');
-  const sectionName = params.get('door');
+  const doorId = params.get('article_id');
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/blogs/${doorId}`)
+    .then((data) => {
+      setArticleInfo(data.data.data);
+      setTitle(data.data.data.title);
+      contentRef.current = data.data.data.html_free_content;
+    })
+    .catch((error) => console.log(error))
+  }, [])
 
   // Mapping
   const imagesShow = images.map((img, key) => (
     <img
+      key={key}
       className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
       src={URL.createObjectURL(img)}
       alt="Test"
@@ -59,7 +70,7 @@ export default function AddBlog() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setImages([...images, ...e.dataTransfer.files]); // تحديث الملفات
+      setImages([...images, ...e.dataTransfer.files]);
       e.dataTransfer.clearData();
     }
   };
@@ -81,24 +92,25 @@ export default function AddBlog() {
   const token = cookie.get("userAccessToken");
 
   async function Submit() {
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", contentRef.current);
-    formData.append("section_id", sectionId);
-    images.forEach((img) => {
-      formData.append("images[]", img);
-    });
+    formData.append("section_id", articleInfo.section_id);
+    //images.forEach((img) => {
+    //  formData.append("images[]", img);
+    //});
     try {
-      const res = await axios.post(`${BASE_URL}/blogs`, formData,{
+      const res = await axios.put(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
     nav('/sections')
-  } catch (error) {
-    console.log(error);
-  }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const config = {
@@ -131,7 +143,7 @@ export default function AddBlog() {
         py-[15px]"
       >
         <div>
-          <span className="font-semibold mr-[10px]">إضافة مقال في <span className="font-bold">{sectionName}</span></span>
+          <span className="font-semibold mr-[10px]">تعديل المقال <span className="font-bold">{articleInfo.title}</span></span>
           <i className="fa-solid fa-door-open"></i>
           <button onClick={()=> nav("/sections")}
           className="md:ml-[25px]
@@ -188,7 +200,6 @@ export default function AddBlog() {
                   hidden
                   type="file"
                   onChange={(e) => setImages([...e.target.files])}
-                  multiple
                 />
                 <div className="flex flex-col items-center">
                   <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
@@ -199,30 +210,28 @@ export default function AddBlog() {
                     اختر الصورة{" "}
                   </p>
                 </div>
-                {imagesShow}
               </div>
             </div>
         </div>
       </div>
       <div className="container m-auto px-[10px] md:px-[25px] flex items-start mb-[20px]">
         <Button
-            className="bg-green-600
-              text-white
-              w-[100px]
-              h-[40px]
-              md:w-[282px]
-              md:h-[65px]
-              rounded-[10px]
-              hover:text-black
-              hover:bg-transparent
-              hover:border-green-600
-              duration-300
-              border-2
-              border-green-600"
-              onClick={Submit}
-              label= "إضافة"
-              icon = "true"
-          />
+          className="bg-green-600
+            text-white
+            w-[100px]
+            h-[40px]
+            md:w-[282px]
+            md:h-[65px]
+            rounded-[10px]
+            hover:text-black
+            hover:bg-transparent
+            hover:border-green-600
+            duration-300
+            border-2
+            border-green-600"
+            onClick={Submit}
+            label= "تعديل"
+        />
       </div>
     </div>
   );

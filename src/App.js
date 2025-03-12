@@ -9,6 +9,8 @@ import "../src/pages/Sections/Editor.css"
 import ListInfo from "./pages/Stickers/ListInfo";
 import Login from "./pages/Authntication/Login";
 import RequireAuth from "./pages/Authntication/RequireAuth";
+import Article from "./pages/Sections/Article";
+import EditBlog from "./pages/Sections/EditBlog";
 
 function App() {
   return (
@@ -17,8 +19,10 @@ function App() {
         <Route path="/" element={<Login/>} />
           <Route element={<RequireAuth />}>
             <Route path="/sections" element={<Sections />} />
+            <Route path="/article" element={<Article />} />
             <Route path="/door" element={<Section />} />
             <Route path="/AddBlog" element={<AddBlog />} />
+            <Route path="/EditBlog" element={<EditBlog />} />
             <Route path="/stickers" element={<Stickers />} />
             <Route path="/listinfo" element={<ListInfo />} />
             <Route path="/tips" element={<Tips />} />

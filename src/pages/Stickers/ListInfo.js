@@ -83,10 +83,6 @@ export default function ListInfo() {
   }
   }
 
-  function handleBack() {
-    nav('/stickers')
-  }
-
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const listId = params.get('listinfo_id');
@@ -135,7 +131,7 @@ export default function ListInfo() {
           <i className="fa-solid fa-note-sticky"></i>
         </div>
         <button
-        onClick={handleBack}
+        onClick={() => nav('/stickers')}
           className="ml-[25px]
           hover:bg-gray-300
           rounded-[10px]
@@ -153,7 +149,7 @@ export default function ListInfo() {
             <div key={index}>
               <img className="w-full h-full" src={sticker.url} alt={`sticker-${index}`} />
             </div>
-          ))
+          ))  
         ) : null
       }
       </div>
