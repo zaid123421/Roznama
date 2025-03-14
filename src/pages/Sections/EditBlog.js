@@ -9,6 +9,7 @@ import Cookies from "universal-cookie";
 
 export default function EditBlog() {
   const [images, setImages] = useState([]);
+  const [imagesUpload, setImagesUpload] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [articleInfo, setArticleInfo] = useState([]);
@@ -24,6 +25,7 @@ export default function EditBlog() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const doorId = params.get('article_id');
+  const doorName = params.get('door');
 
   useEffect(() => {
     axios.get(`${BASE_URL}/blogs/${doorId}`)
@@ -31,14 +33,27 @@ export default function EditBlog() {
       setArticleInfo(data.data.data);
       setTitle(data.data.data.title);
       contentRef.current = data.data.data.html_free_content;
+      if (data.data.data.images && data.data.data.images.length > 0) {
+        setImages(data.data.data.images);
+      }
     })
     .catch((error) => console.log(error))
-  }, [])
-
+  }, [doorId])
+  
   // Mapping
-  const imagesShow = images.map((img, key) => (
+  const imagesShow = images.length > 0
+  ? images.map((img, key) => (
+      <img
+        key={key}
+        className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+        src={img.url}
+        alt="Test"
+      />
+    ))
+  : null;
+
+  const newImage = imagesUpload.map((img, key) => (
     <img
-      key={key}
       className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
       src={URL.createObjectURL(img)}
       alt="Test"
@@ -70,7 +85,7 @@ export default function EditBlog() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setImages([...images, ...e.dataTransfer.files]);
+      setImagesUpload([...images, ...e.dataTransfer.files]);
       e.dataTransfer.clearData();
     }
   };
@@ -92,22 +107,27 @@ export default function EditBlog() {
   const token = cookie.get("userAccessToken");
 
   async function Submit() {
-
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", contentRef.current);
     formData.append("section_id", articleInfo.section_id);
-    //images.forEach((img) => {
-    //  formData.append("images[]", img);
-    //});
+    if(imagesUpload.length !== 0) {
+      imagesUpload.forEach((img) => {
+        formData.append("images[]", img);
+      });
+    } else if(images.length !== 0){
+      images.forEach((img) => {
+        formData.append("images[]", img);
+      });
+    }
     try {
-      const res = await axios.put(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
+      await axios.put(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    nav('/sections')
+    nav(`/door?section_id=${articleInfo.section_id}`)
     } catch (error) {
       console.log(error);
     }
@@ -143,9 +163,9 @@ export default function EditBlog() {
         py-[15px]"
       >
         <div>
-          <span className="font-semibold mr-[10px]">تعديل المقال <span className="font-bold">{articleInfo.title}</span></span>
+          <span className="font-semibold mr-[10px]">تعديل مقال <span className="font-bold">{articleInfo.title}</span></span>
           <i className="fa-solid fa-door-open"></i>
-          <button onClick={()=> nav("/sections")}
+          <button onClick={()=> nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)}
           className="md:ml-[25px]
           hover:bg-gray-300
           rounded-[10px]
@@ -199,7 +219,7 @@ export default function EditBlog() {
                   ref={inputImageRef}
                   hidden
                   type="file"
-                  onChange={(e) => setImages([...e.target.files])}
+                  onChange={(e) => {setImagesUpload([...e.target.files]); setImages([])}}
                 />
                 <div className="flex flex-col items-center">
                   <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
@@ -210,6 +230,7 @@ export default function EditBlog() {
                     اختر الصورة{" "}
                   </p>
                 </div>
+                {imagesUpload.length !== 0 ? newImage : imagesShow}
               </div>
             </div>
         </div>

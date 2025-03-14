@@ -11,6 +11,7 @@ import Login from "./pages/Authntication/Login";
 import RequireAuth from "./pages/Authntication/RequireAuth";
 import Article from "./pages/Sections/Article";
 import EditBlog from "./pages/Sections/EditBlog";
+import Tip from "./pages/Tips/Tip";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/stickers" element={<Stickers />} />
             <Route path="/listinfo" element={<ListInfo />} />
             <Route path="/tips" element={<Tips />} />
+            <Route path="/tip" element={<Tip />} />
           </Route>
       </Routes>
     </div>

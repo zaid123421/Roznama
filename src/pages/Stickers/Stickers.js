@@ -192,7 +192,7 @@ export default function Stickers() {
       formData.append("sticker", img);
     });
     try {
-  const res = await axios.post(`${BASE_URL}/stickers`, formData,{
+    const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
@@ -208,7 +208,7 @@ export default function Stickers() {
   }
 
   const showLists = lists.map((list, index) => (
-    <div
+    <div key={index}
       onClick={() => nav(`/listinfo?listinfo_id=${list.id}`)}
       className="list-box cursor-pointer grid grid-cols-2 relative bg-gradient-to-t"
       style={{

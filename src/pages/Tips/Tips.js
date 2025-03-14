@@ -3,11 +3,16 @@ import Header from "../../components/Header/Header";
 import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
+import Button from "../../components/Button/Button";
+import { useNavigate } from "react-router-dom";
 
 export default function Tips() {
-
+  const [confirm, setConfirm] = useState(false);
+  const [adviceId, setAdviceId] = useState(null);
   const [refreshPage, setRefreshPage] = useState(1);
   const [advices, setAdvices] = useState([]);
+
+  const nav = useNavigate();
 
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken");
@@ -25,26 +30,25 @@ export default function Tips() {
 
   async function handleDeleteTip(id) {
     try{
-      let res = await axios.delete(`${BASE_URL}/advice/${id}`, {
+      await axios.delete(`${BASE_URL}/advice/${id}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(res);
-      console.log("Done !");
+      setConfirm(false);
       setRefreshPage(refreshPage + 1);
     }
     catch {
-      console.log("False !");
+      console.log("Error");
     }
   }
 
   // Show Advices
   const showAdvices = advices.map((advice, index) =>
-    <tr className="border-2 border-[#AEAEAE]">
+    <tr onClick={() => nav(`/tip?tip_id=${advice.id}`)} key={index} className="border-2 border-[#AEAEAE] cursor-pointer">
       <td className="text-center px-[5px]">
-      <i onClick={() => handleDeleteTip(advice.id)} className="fa-solid
+      <i onClick={(e) => {setAdviceId(advice.id); setConfirm(true); e.stopPropagation()}} className="fa-solid
           fa-trash
           w-[30px]
           h-[30px]
@@ -66,7 +70,7 @@ export default function Tips() {
         {(advice.created_at).slice(0, 10)}
       </td>
       <td className="text-[14px] md:text-[18px] text-end md:text-center p-[10px] py-[20px] md:pl-[50px] font-bold">
-        {advice.content}
+        {advice.content.length < 50 ? advice.content : "..." + advice.content.slice(0, 50)}
       </td>
     </tr>
   )
@@ -101,7 +105,7 @@ export default function Tips() {
         </button>
         <div className="ml-[20px] md:ml-[50px]">
           <span className="font-semibold mr-[10px]">النصائح</span>
-          <i class="fa-solid fa-envelope"/>
+          <i className="fa-solid fa-envelope"/>
         </div>
       </div>
       {/* صندوق محتوى الصفحة والجدول */}
@@ -115,35 +119,58 @@ export default function Tips() {
             </tr>
           </thead>
           <tbody>
-            {/* <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">
-                2025/1/1
-              </td>
-              <td className="text-end md:text-center p-[15px] pl-[50px] w-fit text-nowrap md:text-wrap font-bold">
-                مرحباً, أنا هنا لأقدم نصيحة وأرجو أن تؤخذ بعين الاعتبار !
-                بخصوص موضوع مواقيت الصلاة الخ
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">
-                2024/12/31
-              </td>
-              <td className="text-end md:text-center p-[10px] pl-[50px] font-bold">
-                تحية طيبة وبعد, أرجو من القائمين على التطبيق الاهتمام أكثر بالروزنامة
-              </td>
-            </tr>
-            <tr className="border-2 border-[#AEAEAE]">
-              <td className="text-center p-[10px]">
-                2024/12/27
-              </td>
-              <td className="text-end md:text-center p-[10px] pl-[50px] font-bold">
-                السلام عليكم ورحمة الله وبركاته, لايوجد لدينا نصائح بل نريد شكر إدارة التطبيق على الإفادة وجعله الله في ميزان حسناتكم
-              </td>
-            </tr> */}
             {showAdvices}
           </tbody>
         </table>
       </div>
+      {confirm &&
+      <div
+        className="insert-box
+        px-[15px]
+        inset-0
+        bg-black
+        bg-opacity-25
+        flex
+        items-center
+        justify-center
+        fixed
+        z-50
+        px-[25px]"
+        >
+          <div
+            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
+          >
+            <p className="text-right">هل تريد بالتأكيد حذف النصيحة ؟</p>
+            <div className="flex justify-between mt-[50px]">
+              <Button className="bg-green-600
+                text-white
+                w-[100px]
+                h-[40px]
+                md:w-[282px]
+                md:h-[65px]
+                rounded-[10px]
+                hover:text-black
+                hover:bg-transparent
+                hover:border-green-600
+                duration-300
+                border-2
+                border-green-600"
+                label="حذف"
+                onClick={() => handleDeleteTip(adviceId)}
+                />
+              <Button onClick={() => setConfirm(false)}
+                className="hover:bg-gray-300
+              rounded-[10px]
+              duration-300
+              px-[30px]
+              py-[3px]"
+              label= "رجوع"
+              />
+            </div>
+          </div>
+      </div>
+      }
     </div>
   );
 }

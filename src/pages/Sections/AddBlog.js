@@ -89,7 +89,7 @@ export default function AddBlog() {
       formData.append("images[]", img);
     });
     try {
-      const res = await axios.post(`${BASE_URL}/blogs`, formData,{
+      await axios.post(`${BASE_URL}/blogs`, formData,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,

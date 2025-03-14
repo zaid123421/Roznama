@@ -1,11 +1,10 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header/Header";
 import "./Sections.css";
 import axios from "axios";
 import BASE_URL from "../../config";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
-import { User } from "../../hooks/Context";
 import Cookies from "universal-cookie";
 
 export default function Sections() {
@@ -83,7 +82,7 @@ export default function Sections() {
 
   // Show Blogs
   const showBlogs = sections.map((section, index) => (
-    <div onClick={(e) => nav(`/door?section_id=${section.id}&door_name=${section.name}`)}
+    <div key={index} onClick={(e) => nav(`/door?section_id=${section.id}&door_name=${section.name}`)}
       className="door-box cursor-pointer flex flex-col justify-between">
       <div>
         <span className="font-bold">{section.name}</span>
@@ -167,7 +166,7 @@ export default function Sections() {
   ));
 
   const showSearchResults = filteredBlogs.map((blog, index) => (
-    <tr className="border-2 border-[#AEAEAE]" key={index}>
+    <tr key={index} className="border-2 border-[#AEAEAE]">
     <td className="text-center px-[5px]">
     <i
     onClick={() => {setConfirm(true); setArticleName(blog.title); setArticleId(blog.id)}}
@@ -226,7 +225,7 @@ export default function Sections() {
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken")
 
-  async function Submit() {  
+  async function Submit() {
     try {
       const res = await axios.post(
         `${BASE_URL}/sections`,
@@ -253,7 +252,7 @@ export default function Sections() {
 
   async function Edit() {
     try {
-      const res = await axios.put(`${BASE_URL}/sections/${sectionId}`, {
+      await axios.put(`${BASE_URL}/sections/${sectionId}`, {
         name: name,
         about: about,
       },
@@ -274,7 +273,7 @@ export default function Sections() {
 
   async function handleDeleteDoor(id) {
     try {
-      const res = await axios.delete(`${BASE_URL}/sections/${id}`, {
+      await axios.delete(`${BASE_URL}/sections/${id}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
@@ -289,7 +288,7 @@ export default function Sections() {
 
   async function handleDelete(id) {
     try {
-      const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
+      await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`
@@ -426,94 +425,94 @@ export default function Sections() {
       )}
       {/* مودل تعديل الباب */}
       {editDoorModelState && (
-        // صندوق إدخال الباب
+      // صندوق إدخال الباب
+      <div
+        className="insert-box
+      px-[15px]
+      inset-0
+      bg-black
+      bg-opacity-25
+      flex
+      items-center
+      justify-center
+      fixed
+      z-50
+      px-[25px]"
+      >
         <div
-          className="insert-box
-        px-[15px]
-        inset-0
-        bg-black
-        bg-opacity-25
-        flex
-        items-center
-        justify-center
-        fixed
-        z-50
-        px-[25px]"
+          style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+          className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
         >
-          <div
-            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
-          >
-            <p className="flex justify-end pb-[10px] font-bold">تعديل الباب</p>
-            <div className="flex flex-col ">
-              <span className="flex justify-end mb-[5px]">اسم الباب</span>
-              <input
-                autoFocus
-                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
-                  direction === "rtl" ? "text-right" : "text-left"
-                }`}
-                style={{ direction }}
-                name="name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  handleTextDirection(e);
-                }}
-                onBlur={handleBlur}
-              />
-            </div>
-            <div className="flex flex-col mt-[15px]">
-              <span className="flex justify-end mb-[5px]">شرح عن الباب</span>
-              <textarea
-                className={`resize-none border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] min-h-[175px] ${
-                  direction === "rtl"
-                    ? "text-right"
-                    : "text-left focus:border-[#61A3FF]"
-                }`}
-                name="about"
-                style={{ direction }}
-                value={about}
-                onChange={(e) => {
-                  setAbout(e.target.value);
-                  handleTextDirection(e);
-                }}
-                onBlur={handleBlur}
-              />
-            </div>
-            <div className="flex justify-between mt-[15px]">
-              <button
-                onClick={() => {
-                  Edit();
-                }}
-                className="bg-green-600
-              text-white
-              w-[100px]
-              h-[40px]
-              md:w-[282px]
-              md:h-[65px]
-              rounded-[10px]
-              hover:text-black
-              hover:bg-transparent
-              hover:border-green-600
-              duration-300
-              border-2
-              border-green-600"
-              >
-                تعديل
-              </button>
-              <button
-                onClick={handleEditDoorModelState}
-                className="hover:bg-gray-300
-              rounded-[10px]
-              duration-300
-              px-[30px]
-              py-[3px]"
-              >
-                رجوع
-              </button>
-            </div>
+          <p className="flex justify-end pb-[10px] font-bold">تعديل الباب</p>
+          <div className="flex flex-col ">
+            <span className="flex justify-end mb-[5px]">اسم الباب</span>
+            <input
+              autoFocus
+              className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
+                direction === "rtl" ? "text-right" : "text-left"
+              }`}
+              style={{ direction }}
+              name="name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                handleTextDirection(e);
+              }}
+              onBlur={handleBlur}
+            />
+          </div>
+          <div className="flex flex-col mt-[15px]">
+            <span className="flex justify-end mb-[5px]">شرح عن الباب</span>
+            <textarea
+              className={`resize-none border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] min-h-[175px] ${
+                direction === "rtl"
+                  ? "text-right"
+                  : "text-left focus:border-[#61A3FF]"
+              }`}
+              name="about"
+              style={{ direction }}
+              value={about}
+              onChange={(e) => {
+                setAbout(e.target.value);
+                handleTextDirection(e);
+              }}
+              onBlur={handleBlur}
+            />
+          </div>
+          <div className="flex justify-between mt-[15px]">
+            <button
+              onClick={() => {
+                Edit();
+              }}
+              className="bg-green-600
+            text-white
+            w-[100px]
+            h-[40px]
+            md:w-[282px]
+            md:h-[65px]
+            rounded-[10px]
+            hover:text-black
+            hover:bg-transparent
+            hover:border-green-600
+            duration-300
+            border-2
+            border-green-600"
+            >
+              تعديل
+            </button>
+            <button
+              onClick={handleEditDoorModelState}
+              className="hover:bg-gray-300
+            rounded-[10px]
+            duration-300
+            px-[30px]
+            py-[3px]"
+            >
+              رجوع
+            </button>
           </div>
         </div>
+      </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
       {

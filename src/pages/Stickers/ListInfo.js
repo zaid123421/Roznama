@@ -68,7 +68,7 @@ export default function ListInfo() {
       formData.append("sticker", img);
     });
     try {
-  const res = await axios.post(`${BASE_URL}/stickers`, formData,{
+      const res = await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, DragEvent } from "react";
+import { useEffect, useState, DragEvent } from "react";
 import Header from "../../components/Header/Header";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -62,7 +62,7 @@ export default function Section() {
 
   async function handleDelete(id) {
     try {
-      const res = await axios.delete(`${BASE_URL}/blogs/${id}`, {
+      await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ export default function Section() {
     <tr onClick={() => {nav(`/article?article_id=${door.id}&article_name=${door.title}&door=${doorName}&section_id=${sectionId}`);}} className="border-2 border-[#AEAEAE] cursor-pointer" key={index}>
       <td className="text-center px-[5px]">
       <i
-      onClick={(e) => {e.stopPropagation();nav(`/EditBlog?article_id=${door.id}`)}}
+      onClick={(e) => {e.stopPropagation();nav(`/EditBlog?article_id=${door.id}&door=${doorName}`)}}
       className="fa-solid
           fa-wand-magic
           w-[30px]

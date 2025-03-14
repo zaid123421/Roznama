@@ -1,7 +1,6 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import axios from "axios";
-import { User } from "../../hooks/Context";
 import Cookies from "universal-cookie";
 import BASE_URL from "../../config";
 import mosque from "../../assets/mosque.png"
@@ -13,9 +12,6 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
-
-  // useContext
-  const userInfo = useContext(User);
 
   // useNavigate
   const nav = useNavigate();
@@ -29,10 +25,6 @@ export default function Login() {
       });
       const userAccessToken = res.data.data.token;
       const userName = res.data.data.user.username;
-      userInfo.setAuth({
-        userAccessToken,
-        userName,
-      });
       const cookie = new Cookies();
       cookie.set("userName", userName, { path: "/" });
       cookie.set("userAccessToken", userAccessToken, { path: "/" });
