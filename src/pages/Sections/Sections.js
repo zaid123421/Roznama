@@ -11,16 +11,15 @@ export default function Sections() {
   // useState
   const [doorModelState, setDoorModelState] = useState(false);
   const [editDoorModelState, setEditDoorModelState] = useState(false);
-  const [direction, setDirection] = useState("rtl");
+  const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
+  const [sectionId, setSectionId] = useState(0);
+
   const [sections, setSections] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [refreshPage, setRefreshPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-
-  const [name, setName] = useState("");
-  const [about, setAbout] = useState("");
-
-  const [sectionId, setSectionId] = useState(0);
+  const [direction, setDirection] = useState("rtl");
 
   const [confirm, setConfirm] = useState(false);
   const [confirmDoor, setConfirmDoor] = useState(false);
@@ -28,6 +27,9 @@ export default function Sections() {
   const [doorId, setDoorId] = useState(null);
   const [articleName, setArticleName] = useState("");
   const [articleId, setArticleId] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
 
   // useNavigate
   const nav = useNavigate();
@@ -46,16 +48,17 @@ export default function Sections() {
 
   useEffect(() => {
     axios
-      .get(`${BASE_URL}/sections?perPage=75`, {
+      .get(`${BASE_URL}/sections?page=${currentPage}&perPage=15`, {
         headers: {
           Accept: "application/json",
         },
       })
       .then((data) => {
         setSections(data.data.data);
+        setLastPage(data.data.meta.last_page);
       })
       .catch((err) => console.log(err));
-  }, [refreshPage]);
+  }, [currentPage, refreshPage]);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -82,8 +85,13 @@ export default function Sections() {
 
   // Show Blogs
   const showBlogs = sections.map((section, index) => (
-    <div key={index} onClick={(e) => nav(`/door?section_id=${section.id}&door_name=${section.name}`)}
-      className="door-box cursor-pointer flex flex-col justify-between">
+    <div
+      key={index}
+      onClick={(e) =>
+        nav(`/door?section_id=${section.id}&door_name=${section.name}`)
+      }
+      className="door-box cursor-pointer flex flex-col justify-between"
+    >
       <div>
         <span className="font-bold">{section.name}</span>
         <p className="my-[10px] text-justify font-medium p-[20px] rounded-[15px] h-fit">
@@ -96,8 +104,6 @@ export default function Sections() {
             onClick={(e) => {
               handleEditDoorModelState();
               setSectionId(section.id);
-              setName(section.name);
-              setAbout(section.about)
               e.stopPropagation();
             }}
             className="fa-solid
@@ -119,7 +125,7 @@ export default function Sections() {
           <i
             onClick={(e) => {
               setDoorId(section.id);
-              setDoorName(section.name)
+              setDoorName(section.name);
               setConfirmDoor(true);
               e.stopPropagation();
             }}
@@ -167,10 +173,14 @@ export default function Sections() {
 
   const showSearchResults = filteredBlogs.map((blog, index) => (
     <tr key={index} className="border-2 border-[#AEAEAE]">
-    <td className="text-center px-[5px]">
-    <i
-    onClick={() => {setConfirm(true); setArticleName(blog.title); setArticleId(blog.id)}}
-    className="fa-solid
+      <td className="text-center px-[5px]">
+        <i
+          onClick={() => {
+            setConfirm(true);
+            setArticleName(blog.title);
+            setArticleId(blog.id);
+          }}
+          className="fa-solid
         fa-trash
         w-[30px]
         h-[30px]
@@ -186,13 +196,13 @@ export default function Sections() {
         text-[#BF305E]
         duration-300
         hover:bg-slate-200"
-      />
-    </td>
-    <td className="text-center p-[10px]">{(blog.created_at).slice(0, 10)}</td>
-    <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
-      {blog.title}
-    </td>
-  </tr>
+        />
+      </td>
+      <td className="text-center p-[10px]">{blog.created_at.slice(0, 10)}</td>
+      <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
+        {blog.title}
+      </td>
+    </tr>
   ));
 
   // Functions
@@ -223,11 +233,11 @@ export default function Sections() {
 
   // Communicating With Backend
   const cookie = new Cookies();
-  const token = cookie.get("userAccessToken")
+  const token = cookie.get("userAccessToken");
 
   async function Submit() {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${BASE_URL}/sections`,
         {
           name: name,
@@ -240,31 +250,32 @@ export default function Sections() {
           },
         }
       );
-      if (res.status === 201) {
-        console.log("Yes !");
-        handleDoorModelState();
-        setRefreshPage((prev) => prev + 1);
-      }
+      handleDoorModelState();
+      setRefreshPage((prev) => prev + 1);
     } catch (error) {
-      console.error("Error:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
     }
   }
 
   async function Edit() {
     try {
-      await axios.put(`${BASE_URL}/sections/${sectionId}`, {
-        name: name,
-        about: about,
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
+      await axios.put(
+        `${BASE_URL}/sections/${sectionId}`,
+        {
+          name: name,
+          about: about,
         },
-      }
-    );
-      console.log("Yes !");
-      setEditDoorModelState(false);
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      handleEditDoorModelState();
       setRefreshPage((prev) => prev + 1);
     } catch (error) {
       console.log(error);
@@ -291,20 +302,31 @@ export default function Sections() {
       await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
       });
       setFilteredBlogs((prev) => prev.filter((blog) => blog.id !== id));
-      setRefreshPage((prev) => prev + 1);
       setConfirm(false);
     } catch {
       console.log("Error");
     }
   }
 
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <div className="text-base md:text-xl">
-      <Header onSearch={handleSearch}/>
+      <Header onSearch={handleSearch} />
       {/* صندوق المدخل إلى الأبواب وزر إمكانية إضافة الباب */}
       <div
         className="introduction-box
@@ -323,7 +345,7 @@ export default function Sections() {
         py-[15px]"
       >
         <button
-          onClick={() => setDoorModelState(true)}
+          onClick={() => handleDoorModelState("a")}
           className="hover:bg-gray-300
           rounded-[10px]
           duration-300
@@ -395,29 +417,30 @@ export default function Sections() {
             </div>
             <div className="flex justify-between mt-[15px]">
               <Button
-              className={`w-[100px] h-[40px] md:w-[282px] md:h-[65px] rounded-[10px] 
+                className={`w-[100px] h-[40px] md:w-[282px] md:h-[65px] rounded-[10px] 
                 border-2 duration-300 
                 ${
                   name.length > 5 && about.length > 7
                     ? "bg-green-600 text-white hover:text-black hover:bg-transparent border-green-600"
                     : "bg-gray-400 text-white cursor-not-allowed border-gray-400"
                 }`}
-              label="إضافة"
-              onClick={() => {
-                if (name.length > 5 && about.length > 7) {
-                  Submit();
-                }
-              }}
-              icon="true"
-              disabled={name.length <= 5 || about.length <= 7}
+                label="إضافة"
+                onClick={() => {
+                  if (name.length > 5 && about.length > 7) {
+                    Submit();
+                  }
+                }}
+                icon="true"
+                disabled={name.length <= 5 || about.length <= 7}
               />
-              <Button onClick={handleDoorModelState}
+              <Button
+                onClick={handleDoorModelState}
                 className="hover:bg-gray-300
               rounded-[10px]
               duration-300
               px-[30px]
               py-[3px]"
-              label= "رجوع"
+                label="رجوع"
               />
             </div>
           </div>
@@ -425,9 +448,8 @@ export default function Sections() {
       )}
       {/* مودل تعديل الباب */}
       {editDoorModelState && (
-      // صندوق إدخال الباب
-      <div
-        className="insert-box
+        <div
+          className="insert-box
       px-[15px]
       inset-0
       bg-black
@@ -438,53 +460,52 @@ export default function Sections() {
       fixed
       z-50
       px-[25px]"
-      >
-        <div
-          style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-          className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
         >
-          <p className="flex justify-end pb-[10px] font-bold">تعديل الباب</p>
-          <div className="flex flex-col ">
-            <span className="flex justify-end mb-[5px]">اسم الباب</span>
-            <input
-              autoFocus
-              className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
-                direction === "rtl" ? "text-right" : "text-left"
-              }`}
-              style={{ direction }}
-              name="name"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                handleTextDirection(e);
-              }}
-              onBlur={handleBlur}
-            />
-          </div>
-          <div className="flex flex-col mt-[15px]">
-            <span className="flex justify-end mb-[5px]">شرح عن الباب</span>
-            <textarea
-              className={`resize-none border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] min-h-[175px] ${
-                direction === "rtl"
-                  ? "text-right"
-                  : "text-left focus:border-[#61A3FF]"
-              }`}
-              name="about"
-              style={{ direction }}
-              value={about}
-              onChange={(e) => {
-                setAbout(e.target.value);
-                handleTextDirection(e);
-              }}
-              onBlur={handleBlur}
-            />
-          </div>
-          <div className="flex justify-between mt-[15px]">
-            <button
-              onClick={() => {
-                Edit();
-              }}
-              className="bg-green-600
+          <div
+            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
+            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
+          >
+            <p className="flex justify-end pb-[10px] font-bold">تعديل الباب</p>
+            <div className="flex flex-col ">
+              <span className="flex justify-end mb-[5px]">اسم الباب</span>
+              <input
+                autoFocus
+                className={`border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] ${
+                  direction === "rtl" ? "text-right" : "text-left"
+                }`}
+                style={{ direction }}
+                name="name"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  handleTextDirection(e);
+                }}
+                onBlur={handleBlur}
+              />
+            </div>
+            <div className="flex flex-col mt-[15px]">
+              <span className="flex justify-end mb-[5px]">شرح عن الباب</span>
+              <textarea
+                className={`resize-none border-[2px] border-[#AEAEAE] focus:border-[#61A3FF] focus:outline-none rounded-lg p-[10px] min-h-[175px] ${
+                  direction === "rtl"
+                    ? "text-right"
+                    : "text-left focus:border-[#61A3FF]"
+                }`}
+                name="about"
+                style={{ direction }}
+                value={about}
+                onChange={(e) => {
+                  setAbout(e.target.value);
+                  handleTextDirection(e);
+                }}
+                onBlur={handleBlur}
+              />
+            </div>
+            <div className="flex justify-between mt-[15px]">
+              <Button
+                onClick={Edit}
+                label="تعديل"
+                className="bg-green-600
             text-white
             w-[100px]
             h-[40px]
@@ -497,49 +518,47 @@ export default function Sections() {
             duration-300
             border-2
             border-green-600"
-            >
-              تعديل
-            </button>
-            <button
-              onClick={handleEditDoorModelState}
-              className="hover:bg-gray-300
+              />
+              <Button
+                onClick={handleEditDoorModelState}
+                label="رجوع"
+                className="hover:bg-gray-300
             rounded-[10px]
             duration-300
             px-[30px]
             py-[3px]"
-            >
-              رجوع
-            </button>
+              />
+            </div>
           </div>
         </div>
-      </div>
       )}
       {/* صندوق المحتوى يعني صندوق الأبواب */}
-      {
-      searchQuery !== "" && filteredBlogs.length === 0
-      ? <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">لا يوجد نتائج مطابقة</p>
-      : searchQuery !== "" && filteredBlogs.length !== 0
-      ?<div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="text-[#535763]">
-              <th className="w-1/4 p-[10px]">حذف</th>
-              <th className="w-1/4 p-[10px]">التاريخ</th>
-              <th className="w-1/2 p-[10px] text-end">الاسم</th>
-            </tr>
-          </thead>
-          <tbody>
-            {showSearchResults}
-          </tbody>
-        </table>
-      </div>
-      :
-        <div className="articles-content container px-[25px] m-auto mb-[20px]">{showBlogs}</div>
-      }
+      {searchQuery !== "" && filteredBlogs.length === 0 ? (
+        <p className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+          لا يوجد نتائج مطابقة
+        </p>
+      ) : searchQuery !== "" && filteredBlogs.length !== 0 ? (
+        <div className="container m-auto px-[10px] md:px-[25px] overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-[#535763]">
+                <th className="w-1/4 p-[10px]">حذف</th>
+                <th className="w-1/4 p-[10px]">التاريخ</th>
+                <th className="w-1/2 p-[10px] text-end">الاسم</th>
+              </tr>
+            </thead>
+            <tbody>{showSearchResults}</tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="articles-content container px-[25px] m-auto mb-[20px]">
+          {showBlogs}
+        </div>
+      )}
       {/* مودل تأكيد حذف المقال*/}
-      {confirm &&
-      <div
-        className="insert-box
+      {confirm && (
+        <div
+          className="insert-box
         px-[15px]
         inset-0
         bg-black
@@ -555,9 +574,12 @@ export default function Sections() {
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
             className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
-            <p className="text-right">هل تود حقاً حذف <span className="font-bold">{articleName}</span></p>
+            <p className="text-right">
+              هل تود حقاً حذف <span className="font-bold">{articleName}</span>
+            </p>
             <div className="flex justify-between mt-[50px]">
-              <Button className="bg-green-600
+              <Button
+                className="bg-green-600
                 text-white
                 w-[100px]
                 h-[40px]
@@ -572,23 +594,24 @@ export default function Sections() {
                 border-green-600"
                 label="حذف"
                 onClick={() => handleDelete(articleId)}
-                />
-              <Button onClick={() => setConfirm(false)}
+              />
+              <Button
+                onClick={() => setConfirm(false)}
                 className="hover:bg-gray-300
               rounded-[10px]
               duration-300
               px-[30px]
               py-[3px]"
-              label= "رجوع"
+                label="رجوع"
               />
             </div>
           </div>
-      </div>
-      }
+        </div>
+      )}
       {/* مودل تأكيد حذف الباب*/}
-      {confirmDoor &&
-      <div
-        className="insert-box
+      {confirmDoor && (
+        <div
+          className="insert-box
         px-[15px]
         inset-0
         bg-black
@@ -604,9 +627,13 @@ export default function Sections() {
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
             className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
-            <p className="text-right">هل تود حقاً حذف <span className="font-bold">{doorName}</span> مع كل المقالات الخاصة بهذا الباب ؟</p>
+            <p className="text-right">
+              هل تود حقاً حذف <span className="font-bold">{doorName}</span> مع
+              كل المقالات الخاصة بهذا الباب ؟
+            </p>
             <div className="flex justify-between mt-[50px]">
-              <Button className="bg-green-600
+              <Button
+                className="bg-green-600
                 text-white
                 w-[100px]
                 h-[40px]
@@ -621,19 +648,50 @@ export default function Sections() {
                 border-green-600"
                 label="حذف"
                 onClick={() => handleDeleteDoor(doorId)}
-                />
-              <Button onClick={() => setConfirmDoor(false)}
+              />
+              <Button
+                onClick={() => setConfirmDoor(false)}
                 className="hover:bg-gray-300
               rounded-[10px]
               duration-300
               px-[30px]
               py-[3px]"
-              label= "رجوع"
+                label="رجوع"
               />
             </div>
           </div>
-      </div>
-      }
+        </div>
+      )}
+      {/* Pagination */}
+      {searchQuery.length === 0 ? (
+        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPage === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="السابق"
+          />
+          <span className="text-lg font-bold">
+            {currentPage} / {lastPage}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === lastPage}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPage === lastPage
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="التالي"
+          />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 }
