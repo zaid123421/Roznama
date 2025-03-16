@@ -40,8 +40,8 @@ export default function Login() {
   return (
     <div className="w-full h-[100vh] relative md:bg-gradient-to-t from-white via-[rgba(231, 255, 224, 1)] to-[rgba(78,144,60,1)] overflow-hidden">
       <img src = {mosque} alt="mosque" className="hidden md:block w-full absolute bottom-[-75px]" />
-      <img src = {green_logo} alt="mosque" className="hidden md:block w-[200px] lg:w-[300px] absolute right-[10px] top-[-10px]"/>
-      <div className="w-full md:h-fit md:w-[400px] absolute translate-x-[-50%] translate-y-[-50%] left-[50%] top-[50%] p-[20px] md:rounded-md flex flex-col md:bg-white/40 filter backdrop-blur-md md:border-2 md:border-gray-300">
+      <img src = {green_logo} alt="mosque" className="w-[200px] m-auto lg:w-[300px] md:absolute md:right-[10px] md:top-[-10px]"/>
+      <div className="w-full md:h-fit md:w-[400px] absolute translate-x-[-50%] translate-y-[-50%] left-[50%] top-[50%] p-[20px] md:rounded-md flex flex-col md:bg-white/40 filter md:backdrop-blur-md md:border-2 md:border-gray-300">
         <h1 className="mb-[70px] mt-[20px] text-center text-[24px] text-green-800 font-bold">تسجيل الدخول</h1>
         <div className="flex flex-col mb-[25px]">
           <label className="text-right mb-[10px]" htmlFor="login-username-input">

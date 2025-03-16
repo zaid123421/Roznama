@@ -115,23 +115,21 @@ export default function EditBlog() {
       imagesUpload.forEach((img) => {
         formData.append("images[]", img);
       });
-    } else if(images.length !== 0){
-      images.forEach((img) => {
-        formData.append("images[]", img);
-      });
     }
     try {
-      await axios.put(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
+      await axios.post(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    nav(`/door?section_id=${articleInfo.section_id}`)
+    nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)
     } catch (error) {
       console.log(error);
     }
   }
+
+  console.log(articleInfo);
 
   const config = {
     toolbar: [
@@ -146,9 +144,8 @@ export default function EditBlog() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header />
-      <div
-        className="introduction-box
+      <Header disabled="true" />
+      <div className="introduction-box
         text-base
         md:text-2xl
         flex
@@ -162,19 +159,23 @@ export default function EditBlog() {
         border-b-black
         py-[15px]"
       >
-        <div>
-          <span className="font-semibold mr-[10px]">تعديل مقال <span className="font-bold">{articleInfo.title}</span></span>
-          <i className="fa-solid fa-door-open"></i>
-          <button onClick={()=> nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)}
-          className="md:ml-[25px]
+        <div className="flex flex-row-reverse items-center">
+        <button onClick={()=> nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)}
+          className="
+          ml-[10px]
+          md:ml-[25px]
           hover:bg-gray-300
           rounded-[10px]
           duration-300
           px-[10px]
           py-[5px]">
           رجوع
-          <i className="fa-solid fa-chevron-right text-[10px] md:text-[15px] ml-[5px] md:ml-[10px]"></i>
+          <i className="fa-solid fa-chevron-right hidden md:inline md:text-[15px] ml-[5px] md:ml-[10px]"></i>
         </button>
+          <div className="flex items-center">
+            <p className="font-semibold mr-[10px] text-right">تعديل مقال <span className="font-bold">{articleInfo.title}</span></p>
+            <i className="fa-solid fa-door-open"></i>
+          </div>
         </div>
       </div>
       <div className="container m-auto px-[10px] md:px-[25px] flex flex-col flex-col-reverse lg:flex-row my-[15px]">

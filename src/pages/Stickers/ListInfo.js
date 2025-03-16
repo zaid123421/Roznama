@@ -7,26 +7,34 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
 export default function ListInfo() {
+  // Variables
+
+  // useState
   const [listName, setListName] = useState('');
   const [listInfo, setListInfo] = useState(null);
   const [refreshPage, setRefreshPage] = useState(0);
   const [addStickerModel, setAddStickerModel] = useState(false);
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
 
+  // useNavigate
   const nav = useNavigate();
 
+  // useRef
   const inputImageRef = useRef(null);
 
-  // Mapping
-  const imagesShow = images.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
+  // Cookies
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
 
+  // useLocation
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const listId = params.get('listinfo_id');
+
+  // Functions
   function handleStickerModel(name) {
     setAddStickerModel(!addStickerModel);
     setImages([]);
@@ -58,9 +66,44 @@ export default function ListInfo() {
     }
   };
 
-  const cookie = new Cookies();
-  const token = cookie.get("userAccessToken");
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
 
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  // Mapping
+  const imagesShow = images.map((img, key) => (
+    <img
+      key={key}
+      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+      src={URL.createObjectURL(img)}
+      alt="Test"
+    />
+  ));
+
+  // useEffect
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/categories/${listId}??page=${currentPage}&perPage=10`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((data) => {
+        setListInfo(data.data.data);
+        setListName(data.data.data.name);
+      })
+      .catch((err) => console.log(err));
+  }, [currentPage, refreshPage]);
+
+  // Communicating With Backend
   async function addSticker() {
     const formData = new FormData();
     formData.append("category_id", listId)
@@ -83,24 +126,9 @@ export default function ListInfo() {
   }
   }
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const listId = params.get('listinfo_id');
-
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/categories/${listId}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((data) => {setListInfo(data.data.data); setListName(data.data.data.name);})
-      .catch((err) => console.log(err));
-  }, [refreshPage]);
-
   return(
     <>
-      <Header />
+      <Header disabled="true"/>
       <div className="introduction-box
         text-base
         md:text-2xl
@@ -118,7 +146,10 @@ export default function ListInfo() {
       >
         <Button
           onClick={handleStickerModel}
-          className="hover:bg-gray-300
+          className="
+          flex
+          items-center
+            hover:bg-gray-300
             rounded-md
             duration-300
             px-[10px]
@@ -126,7 +157,7 @@ export default function ListInfo() {
           label="إضافة ملصق"
           icon="true"
         />
-        <div className="ml-[20px]">
+        <div className="ml-[20px] flex items-center">
           <span className="font-semibold mr-[10px]">{listName}</span>
           <i className="fa-solid fa-note-sticky"></i>
         </div>
@@ -139,7 +170,7 @@ export default function ListInfo() {
           px-[10px]
           py-[5px]">
           رجوع
-          <i className="fa-solid fa-chevron-right text-[10px] md:text-[15px] ml-[5px] md:ml-[10px]"></i>
+          <i className="fa-solid fa-chevron-right hidden md:inline md:text-[15px] ml-[5px] md:ml-[10px]"></i>
         </button>
       </div>
       <div className="stickers-container container">
@@ -149,7 +180,7 @@ export default function ListInfo() {
             <div key={index}>
               <img className="w-full h-full" src={sticker.url} alt={`sticker-${index}`} />
             </div>
-          ))  
+          ))
         ) : null
       }
       </div>
@@ -233,6 +264,32 @@ export default function ListInfo() {
           </div>
         </div>
       )}
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+        <Button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="السابق"
+        />
+        <span className="text-lg font-bold">
+          {currentPage} / {lastPage}
+        </span>
+        <Button
+          onClick={handleNextPage}
+          disabled={currentPage === lastPage}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === lastPage
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="التالي"
+        />
+      </div>
     </>
   );
 }

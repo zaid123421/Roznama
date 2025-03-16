@@ -114,9 +114,8 @@ export default function AddBlog() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header />
-      <div
-        className="introduction-box
+      <Header disabled="true" />
+      <div className="introduction-box
         text-base
         md:text-2xl
         flex
@@ -130,19 +129,23 @@ export default function AddBlog() {
         border-b-black
         py-[15px]"
       >
-        <div>
-          <span className="font-semibold mr-[10px]">إضافة مقال في <span className="font-bold">{sectionName}</span></span>
-          <i className="fa-solid fa-door-open"></i>
-          <button onClick={()=> nav("/sections")}
-          className="md:ml-[25px]
+        <div className="flex flex-row-reverse items-center">
+        <button onClick={()=> nav("/sections")}
+          className="
+          ml-[10px]
+          md:ml-[25px]
           hover:bg-gray-300
           rounded-[10px]
           duration-300
           px-[10px]
           py-[5px]">
           رجوع
-          <i className="fa-solid fa-chevron-right text-[10px] md:text-[15px] ml-[5px] md:ml-[10px]"></i>
+          <i className="fa-solid fa-chevron-right hidden md:inline md:text-[15px] ml-[5px] md:ml-[10px]"></i>
         </button>
+          <div className="flex items-center">
+            <p className="font-semibold mr-[10px] text-right">إضافة مقال في <span className="font-bold">{sectionName}</span></p>
+            <i className="fa-solid fa-door-open ml-[5px]"></i>
+          </div>
         </div>
       </div>
       <div className="container m-auto px-[10px] md:px-[25px] flex flex-col flex-col-reverse lg:flex-row my-[15px]">

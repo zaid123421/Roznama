@@ -22,44 +22,15 @@ export default function Stickers() {
   const [confirm, setConfirm] = useState(false);
   const [listId, setListId] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
+
   const inputImageRef = useRef(null);
 
   const nav = useNavigate();
 
-  // Mapping
-  const imagesShow = images.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
-
-  useEffect(() => {
-    if (listModel) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [listModel]);
-
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken");
-
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/categories?perPage=75`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((data) => setLists(data.data.data))
-      .catch((err) => console.log(err));
-  }, [refreshPage]);
 
   const handleTextDirection = (e) => {
     const value = e.target.value;
@@ -111,101 +82,32 @@ export default function Stickers() {
     setImages([]);
   }
 
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   function handleEditListModel() {
     setName("");
     setEditListModel(!editListModel);
   }
 
-  async function Submit() {
-    try {
-      const res = await axios.post(
-        `${BASE_URL}/categories`,
-        {
-          name: name,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (res.status === 201) {
-        console.log("Yes !");
-        handleListModel();
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function Edit() {
-    try {
-      const res = await axios.put(
-        `${BASE_URL}/categories/${categoryId}`,
-        {
-          name: name,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (res.status === 200) {
-        console.log("Yes !");
-        handleEditListModel();
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function handleDeleteList(id) {
-    try {
-      const res = await axios.delete(
-        `${BASE_URL}/categories/${id}`,
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (res.status === 204) {
-        console.log("Yes !");
-        setConfirm(false);
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function addSticker() {
-    const formData = new FormData();
-    formData.append("category_id", categoryId)
-    images.forEach((img) => {
-      formData.append("sticker", img);
-    });
-    try {
-    const res = await axios.post(`${BASE_URL}/stickers`, formData,{
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    });
-    if(res.status === 201) {
-      handleStickerModel();
-      setRefreshPage((prev) => prev + 1);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  }
+  // Mapping
+  const imagesShow = images.map((img, key) => (
+    <img
+      key={key}
+      className="w-[75px] h-[75px] sm:w-[150px] sm:h-[150px]"
+      src={URL.createObjectURL(img)}
+      alt="Test"
+    />
+  ));
 
   const showLists = lists.map((list, index) => (
     <div key={index}
@@ -319,9 +221,123 @@ export default function Stickers() {
     </div>
   ));
 
+  // useEffect
+  useEffect(() => {
+    if (listModel || editListModel || addStickerModel || confirm) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [listModel, editListModel, addStickerModel, confirm]);
+
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/categories?page=${currentPage}&perPage=9`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((data) => {
+        setLists(data.data.data);
+        setLastPage(data.data.meta.last_page);
+      })
+      .catch((err) => console.log(err));
+  }, [currentPage, refreshPage]);
+
+  // Communicating With Backend
+  async function Submit() {
+    try {
+      await axios.post(
+        `${BASE_URL}/categories`,
+        {
+          name: name,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+        handleListModel();
+        setRefreshPage((prev) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function Edit() {
+    try {
+      const res = await axios.put(
+        `${BASE_URL}/categories/${categoryId}`,
+        {
+          name: name,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.status === 200) {
+        console.log("Yes !");
+        handleEditListModel();
+        setRefreshPage((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleDeleteList(id) {
+    try {
+      const res = await axios.delete(
+        `${BASE_URL}/categories/${id}`,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.status === 204) {
+        console.log("Yes !");
+        setConfirm(false);
+        setRefreshPage((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function addSticker() {
+    const formData = new FormData();
+    formData.append("category_id", categoryId)
+    images.forEach((img) => {
+      formData.append("sticker", img);
+    });
+    try {
+    const res = await axios.post(`${BASE_URL}/stickers`, formData,{
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    });
+      handleStickerModel();
+      setRefreshPage((prev) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="text-base md:text-xl">
-      <Header />
+      <Header disabled="true" />
       {/* صندوق مدخل إلى الملصقات */}
       <div
         className="introduction-box
@@ -479,9 +495,11 @@ export default function Stickers() {
                     <span className="hidden md:inline-block">
                       أو اسحبها هنا
                     </span>{" "}
-                    اختر الصورة{" "}
+                    اختر الصور{" "}
                   </p>
                 </div>
+              </div>
+              <div className="max-h-[200px] overflow-auto w-full grid grid-cols-3 gap-1.5 justify-between">
                 {imagesShow}
               </div>
             </div>
@@ -632,6 +650,32 @@ export default function Stickers() {
           </div>
       </div>
       }
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+        <Button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="السابق"
+        />
+        <span className="text-lg font-bold">
+          {currentPage} / {lastPage}
+        </span>
+        <Button
+          onClick={handleNextPage}
+          disabled={currentPage === lastPage}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === lastPage
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="التالي"
+        />
+      </div>
     </div>
   );
 }

@@ -11,6 +11,8 @@ export default function Tips() {
   const [adviceId, setAdviceId] = useState(null);
   const [refreshPage, setRefreshPage] = useState(1);
   const [advices, setAdvices] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
 
   const nav = useNavigate();
 
@@ -18,15 +20,30 @@ export default function Tips() {
   const token = cookie.get("userAccessToken");
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/advice`,{
+    axios.get(`${BASE_URL}/advice?page=${currentPage}&perPage=10`,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     })
-    .then((data) => setAdvices(data.data.data))
+    .then((data) => {
+      setAdvices(data.data.data);
+      setLastPage(data.data.meta.last_page)
+    })
     .catch((err) => console.log(err));
-  }, [refreshPage])
+  }, [currentPage, refreshPage])
+
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   async function handleDeleteTip(id) {
     try{
@@ -66,7 +83,7 @@ export default function Tips() {
           hover:bg-slate-200"
         />
       </td>
-      <td className="text-center p-[10px]">
+      <td className="text-center p-[10px] text-[12px] md:text-[16px]">
         {(advice.created_at).slice(0, 10)}
       </td>
       <td className="text-[14px] md:text-[18px] text-end md:text-center p-[10px] py-[20px] md:pl-[50px] font-bold">
@@ -77,7 +94,7 @@ export default function Tips() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header />
+      <Header disabled="true" />
       {/* صندوق مدخل إلى النصائح */}
       <div className="introduction-box
         text-base
@@ -171,6 +188,32 @@ export default function Tips() {
           </div>
       </div>
       }
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+        <Button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="السابق"
+        />
+        <span className="text-lg font-bold">
+          {currentPage} / {lastPage}
+        </span>
+        <Button
+          onClick={handleNextPage}
+          disabled={currentPage === lastPage}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === lastPage
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="التالي"
+        />
+      </div>
     </div>
   );
 }

@@ -1,22 +1,13 @@
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/lastlogo.png";
 import { useState } from "react";
-export default function Header({onSearch}) {
+export default function Header({onSearch, disabled}) {
   const [isOpened, setIsOpened] = useState(false);
   const [direction, setDirection] = useState("rtl");
 
   function handleClick() {
     setIsOpened(!isOpened);
   }
-
-  const handleInputChange = (event) => {
-    const value = event.target.value;
-    if (/[\u0600-\u06FF]/.test(value)) {
-      setDirection("rtl");
-    } else {
-      setDirection("ltr");
-    }
-  };
 
   const handleBlur = () => {
     setDirection("rtl");
@@ -119,16 +110,18 @@ export default function Header({onSearch}) {
           </li>
         </ul>
         {/* Search Box */}
-        <div className="bg-white hidden md:flex items-center text-black px-[25px] py-[7px] w-[350px] rounded-xl">
+        <div className={`bg-white hidden md:flex items-center text-black px-[25px] py-[7px] w-[350px] rounded-xl
+          ${disabled === "true" ? "md:hidden" : ""}`}>
           <i className="fa-solid fa-magnifying-glass text-gray-400" />
           <input
             placeholder="ابحث هنا"
             className={`flex justify-start w-full outline-none focus:text-right ${
-              direction === "rtl" ? "text-right" : "text-left"
-            }`}
+              direction === "rtl" ? "text-right" : "text-left"}`
+            }
             style={{ direction }}
-            onChange={(e) => onSearch(e.target.value)}
+            onChange={(e) => !disabled && onSearch(e.target.value)}
             onBlur={handleBlur}
+            disabled={disabled}
           />
         </div>
         {/* Logo */}

@@ -8,82 +8,91 @@ import Button from "../../components/Button/Button";
 import Cookies from "universal-cookie";
 
 export default function Sections() {
+  // Variables
   // useState
   const [doorModelState, setDoorModelState] = useState(false);
   const [editDoorModelState, setEditDoorModelState] = useState(false);
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
   const [sectionId, setSectionId] = useState(0);
-
   const [sections, setSections] = useState([]);
   const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [refreshPage, setRefreshPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [direction, setDirection] = useState("rtl");
-
   const [confirm, setConfirm] = useState(false);
   const [confirmDoor, setConfirmDoor] = useState(false);
   const [doorName, setDoorName] = useState("");
   const [doorId, setDoorId] = useState(null);
   const [articleName, setArticleName] = useState("");
   const [articleId, setArticleId] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
+  const [currentPageBlog, setCurrentPageBlog] = useState(1);
+  const [lastPageBlog, setLastPageBlog] = useState(null);
 
   // useNavigate
   const nav = useNavigate();
 
-  // useEffect
-  useEffect(() => {
-    if (doorModelState || editDoorModelState) {
-      document.body.style.overflow = "hidden";
+  // Cookies
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
+
+  // Functions
+  function handleDoorModelState() {
+    setDoorModelState(!doorModelState);
+    setName("");
+    setAbout("");
+  }
+
+  function handleEditDoorModelState() {
+    setEditDoorModelState(!editDoorModelState);
+    setName("");
+    setAbout("");
+  }
+
+  const handleTextDirection = (e) => {
+    const value = e.target.value;
+    if (/[\u0600-\u06FF]/.test(value)) {
+      setDirection("rtl");
     } else {
-      document.body.style.overflow = "auto";
+      setDirection("ltr");
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [doorModelState, editDoorModelState]);
-
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/sections?page=${currentPage}&perPage=15`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((data) => {
-        setSections(data.data.data);
-        setLastPage(data.data.meta.last_page);
-      })
-      .catch((err) => console.log(err));
-  }, [currentPage, refreshPage]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredBlogs([]);
-      return;
-    }
-    axios
-      .get(`${BASE_URL}/blogs?title=${searchQuery}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        setFilteredBlogs(response.data.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }, [searchQuery]);
+  };
 
   function handleSearch(query) {
     setSearchQuery(query);
   }
 
-  // Show Blogs
+  const handleBlur = () => {
+    setDirection("rtl");
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPageBlog = () => {
+    if (currentPageBlog < lastPageBlog) {
+      setCurrentPageBlog((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPageBlog = () => {
+    if (currentPageBlog > 1) {
+      setCurrentPageBlog((prev) => prev - 1);
+    }
+  };
+
+  // Mapping
   const showBlogs = sections.map((section, index) => (
     <div
       key={index}
@@ -103,6 +112,8 @@ export default function Sections() {
           <i
             onClick={(e) => {
               handleEditDoorModelState();
+              setName(section.name)
+              setAbout(section.about)
               setSectionId(section.id);
               e.stopPropagation();
             }}
@@ -198,43 +209,60 @@ export default function Sections() {
         hover:bg-slate-200"
         />
       </td>
-      <td className="text-center p-[10px]">{blog.created_at.slice(0, 10)}</td>
+      <td className="text-center p-[10px] text-[12px] md:text-[16px]">{blog.created_at.slice(0, 10)}</td>
       <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
         {blog.title}
       </td>
     </tr>
   ));
 
-  // Functions
-  function handleDoorModelState() {
-    setDoorModelState(!doorModelState);
-    setName("");
-    setAbout("");
-  }
-
-  function handleEditDoorModelState() {
-    setEditDoorModelState(!editDoorModelState);
-    setName("");
-    setAbout("");
-  }
-
-  const handleTextDirection = (e) => {
-    const value = e.target.value;
-    if (/[\u0600-\u06FF]/.test(value)) {
-      setDirection("rtl");
+  // useEffect
+  useEffect(() => {
+    if (doorModelState || editDoorModelState || confirm || confirmDoor) {
+      document.body.style.overflow = "hidden";
     } else {
-      setDirection("ltr");
+      document.body.style.overflow = "auto";
     }
-  };
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [doorModelState, editDoorModelState, confirm, confirmDoor]);
 
-  const handleBlur = () => {
-    setDirection("rtl");
-  };
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/sections?page=${currentPage}&perPage=15`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((data) => {
+        setSections(data.data.data);
+        setLastPage(data.data.meta.last_page);
+      })
+      .catch((err) => console.log(err));
+  }, [currentPage, refreshPage]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredBlogs([]);
+      return;
+    }
+    axios
+      .get(`${BASE_URL}/blogs?title=${searchQuery}&page=${currentPageBlog}&perPage=10`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        setFilteredBlogs(response.data.data);
+        setLastPageBlog(response.data.meta.last_page);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [currentPageBlog, searchQuery]);
 
   // Communicating With Backend
-  const cookie = new Cookies();
-  const token = cookie.get("userAccessToken");
-
   async function Submit() {
     try {
       await axios.post(
@@ -261,6 +289,7 @@ export default function Sections() {
   }
 
   async function Edit() {
+    console.log(sectionId);
     try {
       await axios.put(
         `${BASE_URL}/sections/${sectionId}`,
@@ -311,18 +340,6 @@ export default function Sections() {
       console.log("Error");
     }
   }
-
-  const handleNextPage = () => {
-    if (currentPage < lastPage) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
 
   return (
     <div className="text-base md:text-xl">
@@ -683,6 +700,35 @@ export default function Sections() {
             disabled={currentPage === lastPage}
             className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
               currentPage === lastPage
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="التالي"
+          />
+        </div>
+      ) : (
+        ""
+      )}
+      {searchQuery.length !== 0 ? (
+        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+          <Button
+            onClick={handlePrevPageBlog}
+            disabled={currentPageBlog === 1}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPageBlog === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="السابق"
+          />
+          <span className="text-lg font-bold">
+            {currentPageBlog} / {lastPageBlog}
+          </span>
+          <Button
+            onClick={handleNextPageBlog}
+            disabled={currentPageBlog === lastPageBlog}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPageBlog === lastPageBlog
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-gray-400"
             }`}

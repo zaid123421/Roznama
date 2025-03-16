@@ -7,6 +7,7 @@ import Cookies from "universal-cookie";
 import Button from "../../components/Button/Button";
 
 export default function Section() {
+  // Variables
   // useState
   const [doorInfo, setDoorInfo] = useState(null);
   const [refreshPage, setRefreshPage] = useState(0);
@@ -15,66 +16,54 @@ export default function Section() {
   const [confirm, setConfirm] = useState(false);
   const [articleName, setArticleName] = useState("");
   const [articleId, setArticleId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(null);
+  const [currentPageBlog, setCurrentPageBlog] = useState(1);
+  const [lastPageBlog, setLastPageBlog] = useState(null);
 
+  // useNavigate
   const nav = useNavigate();
 
+  // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const sectionId = params.get('section_id');
   const doorName = params.get('door_name');
 
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/blogs?section_id=${sectionId}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((data) => {setDoorInfo(data.data.data)})
-      .catch((err) => console.log(err));
-  }, [refreshPage]);
+  // Cookies
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredBlogs([]);
-      return;
-    }
-    axios
-      .get(`${BASE_URL}/blogs?section_id=${sectionId}&title=${searchQuery}`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((response) => {
-        setFilteredBlogs(response.data.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }, [searchQuery]);
-
+  // Functions
   function handleSearch(query) {
     setSearchQuery(query);
   }
 
-  const cookie = new Cookies();
-  const token = cookie.get("userAccessToken");
-
-  async function handleDelete(id) {
-    try {
-      await axios.delete(`${BASE_URL}/blogs/${id}`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setRefreshPage(refreshPage + 1);
-      setConfirm(false);
-    } catch {
-      console.log("Error");
+  const handleNextPage = () => {
+    if (currentPage < lastPage) {
+      setCurrentPage((prev) => prev + 1);
     }
-  }
+  };
 
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPageBlog = () => {
+    if (currentPageBlog < lastPageBlog) {
+      setCurrentPageBlog((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevPageBlog = () => {
+    if (currentPageBlog > 1) {
+      setCurrentPageBlog((prev) => prev - 1);
+    }
+  };
+
+  // Mapping
   const showDoor = Array.isArray(doorInfo) && doorInfo.length > 0 ? doorInfo.map((door, index) => (
     <tr onClick={() => {nav(`/article?article_id=${door.id}&article_name=${door.title}&door=${doorName}&section_id=${sectionId}`);}} className="border-2 border-[#AEAEAE] cursor-pointer" key={index}>
       <td className="text-center px-[5px]">
@@ -119,7 +108,7 @@ export default function Section() {
           hover:bg-slate-200"
       />
       </td>
-      <td className="text-center p-[10px]">{(door.created_at).slice(0, 10)}</td>
+      <td className="text-center p-[10px] text-[12px] md:text-[16px]">{(door.created_at).slice(0, 10)}</td>
       <td className="text-end p-[10px] w-full text-nowrap md:text-wrap font-bold">
         {door.title}
       </td>
@@ -149,19 +138,69 @@ export default function Section() {
         hover:bg-slate-200"
       />
     </td>
-    <td className="text-center p-[10px]">{(blog.created_at).slice(0, 10)}</td>
+    <td className="text-center p-[10px] text-[12px] md:text-[16px]">{(blog.created_at).slice(0, 10)}</td>
     <td className="text-center p-[10px] w-fit text-nowrap md:text-wrap font-bold">
       {blog.title}
     </td>
   </tr>
   ));
 
+  // useEffect
+  useEffect(() => {
+    axios
+      .get(`${BASE_URL}/blogs?section_id=${sectionId}&page=${currentPage}&perPage=10`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((data) => {
+        setDoorInfo(data.data.data);
+        setLastPage(data.data.meta.last_page);
+      })
+      .catch((err) => console.log(err));
+  }, [currentPage, refreshPage]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredBlogs([]);
+      return;
+    }
+    axios
+      .get(`${BASE_URL}/blogs?section_id=${sectionId}&title=${searchQuery}&page=${currentPageBlog}&perPage=10`, {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        setFilteredBlogs(response.data.data);
+        setLastPageBlog(response.data.meta.last_page);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+      });
+  }, [currentPageBlog, searchQuery]);
+
+  // Communicating With Backend
+  async function handleDelete(id) {
+    try {
+      await axios.delete(`${BASE_URL}/blogs/${id}`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRefreshPage(refreshPage + 1);
+      setConfirm(false);
+    } catch {
+      console.log("Error");
+    }
+  }
+
   return (
     <div className="text-base md:text-xl">
       <Header onSearch={handleSearch}/>
       {/* صندوق مدخل إلى النصائح */}
-      <div
-        className="introduction-box
+      <div className="introduction-box
         text-base
         md:text-2xl
         flex
@@ -175,8 +214,8 @@ export default function Section() {
         border-b-black
         py-[15px]"
       >
-        <div className="ml-[20px] md:ml-[50px]">
-          <span className="font-semibold mr-[10px]">{doorName}</span>
+        <div className="flex items-center">
+          <p className="font-semibold mr-[10px] text-right">{doorName}</p>
           <i className="fa-solid fa-door-open"></i>
         </div>
         <button onClick={() => nav('/sections')}
@@ -187,7 +226,7 @@ export default function Section() {
           px-[10px]
           py-[5px]">
           رجوع
-          <i className="fa-solid fa-chevron-right text-[10px] md:text-[15px] ml-[5px] md:ml-[10px]"></i>
+          <i className="fa-solid fa-chevron-right hidden md:inline md:text-[15px] ml-[5px] md:ml-[10px]"></i>
         </button>
       </div>
       {/* صندوق محتوى الصفحة والجدول */}
@@ -273,6 +312,65 @@ export default function Section() {
           </div>
       </div>
       }
+      {/* Pagination */}
+      {searchQuery.length === 0 ? (
+        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPage === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="السابق"
+          />
+          <span className="text-lg font-bold">
+            {currentPage} / {lastPage}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === lastPage}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPage === lastPage
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="التالي"
+          />
+        </div>
+      ) : (
+        ""
+      )}
+      {searchQuery.length !== 0 ? (
+        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+          <Button
+            onClick={handlePrevPageBlog}
+            disabled={currentPageBlog === 1}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPageBlog === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="السابق"
+          />
+          <span className="text-lg font-bold">
+            {currentPageBlog} / {lastPageBlog}
+          </span>
+          <Button
+            onClick={handleNextPageBlog}
+            disabled={currentPageBlog === lastPageBlog}
+            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+              currentPageBlog === lastPageBlog
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+            label="التالي"
+          />
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 }
