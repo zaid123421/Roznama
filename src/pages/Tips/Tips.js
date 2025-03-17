@@ -100,7 +100,7 @@ export default function Tips() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled={true} />
+      <Header disabled="true" />
       {/* صندوق مدخل إلى النصائح */}
       <div className="introduction-box
         text-base

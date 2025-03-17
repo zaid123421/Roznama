@@ -341,7 +341,7 @@ export default function Stickers() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled={true} />
+      <Header disabled="true" />
       {/* صندوق مدخل إلى الملصقات */}
       <div
         className="introduction-box

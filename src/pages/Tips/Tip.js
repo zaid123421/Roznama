@@ -35,7 +35,7 @@ export default function Tip(){
 
   return(
     <div>
-      <Header disabled={true} />
+      <Header disabled="true" />
       <div className="introduction-box
         text-base
         md:text-2xl

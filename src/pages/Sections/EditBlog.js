@@ -150,7 +150,7 @@ export default function EditBlog() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled={true} />
+      <Header disabled="true"/>
       <div className="introduction-box
         text-base
         md:text-2xl
