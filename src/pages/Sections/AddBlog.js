@@ -8,6 +8,7 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
 export default function AddBlog() {
+  // useState
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [direction, setDirection] = useState("rtl");
@@ -20,20 +21,17 @@ export default function AddBlog() {
   // useNavigate
   const nav = useNavigate();
 
+  // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const sectionId = params.get('section_id');
   const sectionName = params.get('door');
 
-  // Mapping
-  const imagesShow = images.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
+  // Cookies
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
 
+  // Functions
   const handleEditorChange = (newContent) => {
     contentRef.current = newContent;
   };
@@ -77,9 +75,16 @@ export default function AddBlog() {
     setDirection("rtl");
   };
 
-  const cookie = new Cookies();
-  const token = cookie.get("userAccessToken");
+  // Mapping
+  const imagesShow = images.map((img, key) => (
+    <img
+      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+      src={URL.createObjectURL(img)}
+      alt="Test"
+    />
+  ));
 
+  // Communicatin With Backend
   async function Submit() {
     const formData = new FormData();
     formData.append("title", title);
@@ -101,6 +106,7 @@ export default function AddBlog() {
   }
   }
 
+  // Configration 
   const config = {
     toolbar: [
       ["bold", "italic", "underline", "strikethrough"],
@@ -114,7 +120,7 @@ export default function AddBlog() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled="true" />
+      <Header disabled={true} />
       <div className="introduction-box
         text-base
         md:text-2xl

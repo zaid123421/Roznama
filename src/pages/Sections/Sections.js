@@ -8,7 +8,6 @@ import Button from "../../components/Button/Button";
 import Cookies from "universal-cookie";
 
 export default function Sections() {
-  // Variables
   // useState
   const [doorModelState, setDoorModelState] = useState(false);
   const [editDoorModelState, setEditDoorModelState] = useState(false);

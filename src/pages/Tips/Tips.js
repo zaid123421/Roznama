@@ -7,6 +7,7 @@ import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
 
 export default function Tips() {
+  // useState
   const [confirm, setConfirm] = useState(false);
   const [adviceId, setAdviceId] = useState(null);
   const [refreshPage, setRefreshPage] = useState(1);
@@ -14,25 +15,14 @@ export default function Tips() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
 
+  // useNavigate
   const nav = useNavigate();
 
+  // Cookies
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken");
 
-  useEffect(() => {
-    axios.get(`${BASE_URL}/advice?page=${currentPage}&perPage=10`,{
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((data) => {
-      setAdvices(data.data.data);
-      setLastPage(data.data.meta.last_page)
-    })
-    .catch((err) => console.log(err));
-  }, [currentPage, refreshPage])
-
+  // Functions
   const handleNextPage = () => {
     if (currentPage < lastPage) {
       setCurrentPage((prev) => prev + 1);
@@ -45,23 +35,7 @@ export default function Tips() {
     }
   };
 
-  async function handleDeleteTip(id) {
-    try{
-      await axios.delete(`${BASE_URL}/advice/${id}`, {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setConfirm(false);
-      setRefreshPage(refreshPage + 1);
-    }
-    catch {
-      console.log("Error");
-    }
-  }
-
-  // Show Advices
+  // Mapping
   const showAdvices = advices.map((advice, index) =>
     <tr onClick={() => nav(`/tip?tip_id=${advice.id}`)} key={index} className="border-2 border-[#AEAEAE] cursor-pointer">
       <td className="text-center px-[5px]">
@@ -92,9 +66,41 @@ export default function Tips() {
     </tr>
   )
 
+  // useEffect
+  useEffect(() => {
+    axios.get(`${BASE_URL}/advice?page=${currentPage}&perPage=10`,{
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((data) => {
+      setAdvices(data.data.data);
+      setLastPage(data.data.meta.last_page)
+    })
+    .catch((err) => console.log(err));
+  }, [currentPage, refreshPage])
+
+  // Communicating With Backend
+  async function handleDeleteTip(id) {
+    try{
+      await axios.delete(`${BASE_URL}/advice/${id}`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setConfirm(false);
+      setRefreshPage(refreshPage + 1);
+    }
+    catch {
+      console.log("Error");
+    }
+  }
+
   return (
     <div className="text-base md:text-xl">
-      <Header disabled="true" />
+      <Header disabled={true} />
       {/* صندوق مدخل إلى النصائح */}
       <div className="introduction-box
         text-base

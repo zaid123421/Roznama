@@ -7,7 +7,6 @@ import Cookies from "universal-cookie";
 import Button from "../../components/Button/Button";
 
 export default function Section() {
-  // Variables
   // useState
   const [doorInfo, setDoorInfo] = useState(null);
   const [refreshPage, setRefreshPage] = useState(0);

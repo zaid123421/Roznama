@@ -8,6 +8,7 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
 export default function EditBlog() {
+  // useState
   const [images, setImages] = useState([]);
   const [imagesUpload, setImagesUpload] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -22,44 +23,17 @@ export default function EditBlog() {
   // useNavigate
   const nav = useNavigate();
 
+  // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const doorId = params.get('article_id');
   const doorName = params.get('door');
 
-  useEffect(() => {
-    axios.get(`${BASE_URL}/blogs/${doorId}`)
-    .then((data) => {
-      setArticleInfo(data.data.data);
-      setTitle(data.data.data.title);
-      contentRef.current = data.data.data.html_free_content;
-      if (data.data.data.images && data.data.data.images.length > 0) {
-        setImages(data.data.data.images);
-      }
-    })
-    .catch((error) => console.log(error))
-  }, [doorId])
-  
-  // Mapping
-  const imagesShow = images.length > 0
-  ? images.map((img, key) => (
-      <img
-        key={key}
-        className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
-        src={img.url}
-        alt="Test"
-      />
-    ))
-  : null;
+  // Cookies
+  const cookie = new Cookies();
+  const token = cookie.get("userAccessToken");
 
-  const newImage = imagesUpload.map((img, key) => (
-    <img
-      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
-      src={URL.createObjectURL(img)}
-      alt="Test"
-    />
-  ));
-
+  // Functions
   const handleEditorChange = (newContent) => {
     contentRef.current = newContent;
   };
@@ -103,9 +77,42 @@ export default function EditBlog() {
     setDirection("rtl");
   };
 
-  const cookie = new Cookies();
-  const token = cookie.get("userAccessToken");
+  // Mapping
+  const imagesShow = images.length > 0
+  ? images.map((img, key) => (
+      <img
+        key={key}
+        className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+        src={img.url}
+        alt="Test"
+      />
+    ))
+  : null;
 
+  const newImage = imagesUpload.map((img, key) => (
+    <img
+      key={key}
+      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+      src={URL.createObjectURL(img)}
+      alt="Test"
+    />
+  ));
+
+  // useEffect
+  useEffect(() => {
+    axios.get(`${BASE_URL}/blogs/${doorId}`)
+    .then((data) => {
+      setArticleInfo(data.data.data);
+      setTitle(data.data.data.title);
+      contentRef.current = data.data.data.html_free_content;
+      if (data.data.data.images && data.data.data.images.length > 0) {
+        setImages(data.data.data.images);
+      }
+    })
+    .catch((error) => console.log(error))
+  }, [doorId])
+
+  // Communicatin With Backend
   async function Submit() {
     const formData = new FormData();
     formData.append("title", title);
@@ -129,8 +136,7 @@ export default function EditBlog() {
     }
   }
 
-  console.log(articleInfo);
-
+  // Configration
   const config = {
     toolbar: [
       ["bold", "italic", "underline", "strikethrough"],
@@ -144,7 +150,7 @@ export default function EditBlog() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled="true" />
+      <Header disabled={true} />
       <div className="introduction-box
         text-base
         md:text-2xl

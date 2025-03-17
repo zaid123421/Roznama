@@ -7,11 +7,8 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
 export default function ListInfo() {
-  // Variables
-
   // useState
-  const [listName, setListName] = useState('');
-  const [listInfo, setListInfo] = useState(null);
+  const [listImages, setListImages] = useState([]);
   const [refreshPage, setRefreshPage] = useState(0);
   const [addStickerModel, setAddStickerModel] = useState(false);
   const [images, setImages] = useState([]);
@@ -33,7 +30,8 @@ export default function ListInfo() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const listId = params.get('listinfo_id');
-
+  const listName = params.get('listName');
+  
   // Functions
   function handleStickerModel(name) {
     setAddStickerModel(!addStickerModel);
@@ -82,7 +80,7 @@ export default function ListInfo() {
   const imagesShow = images.map((img, key) => (
     <img
       key={key}
-      className="absolute right-0 top-0 rounded-[15px] h-full w-full z-10"
+      className="w-[75px] h-[75px] sm:w-[150px] sm:h-[150px]"
       src={URL.createObjectURL(img)}
       alt="Test"
     />
@@ -90,15 +88,26 @@ export default function ListInfo() {
 
   // useEffect
   useEffect(() => {
+    if (addStickerModel) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [addStickerModel]);
+
+  useEffect(() => {
     axios
-      .get(`${BASE_URL}/categories/${listId}??page=${currentPage}&perPage=10`, {
+      .get(`${BASE_URL}/stickers/?page=${currentPage}&perPage=10`, {
         headers: {
           Accept: "application/json",
         },
       })
       .then((data) => {
-        setListInfo(data.data.data);
-        setListName(data.data.data.name);
+        setListImages(data.data.data);
+        setLastPage(data.data.meta.last_page);
       })
       .catch((err) => console.log(err));
   }, [currentPage, refreshPage]);
@@ -108,19 +117,17 @@ export default function ListInfo() {
     const formData = new FormData();
     formData.append("category_id", listId)
     images.forEach((img) => {
-      formData.append("sticker", img);
+      formData.append("stickers[]", img);
     });
+    console.log(images);
     try {
-      const res = await axios.post(`${BASE_URL}/stickers`, formData,{
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    });
-    if(res.status === 201) {
+      await axios.post(`${BASE_URL}/stickers`, formData,{
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      }});
       handleStickerModel();
       setRefreshPage((prev) => prev + 1);
-    }
   } catch (error) {
     console.log(error);
   }
@@ -128,7 +135,7 @@ export default function ListInfo() {
 
   return(
     <>
-      <Header disabled="true"/>
+      <Header disabled={true}/>
       <div className="introduction-box
         text-base
         md:text-2xl
@@ -175,8 +182,8 @@ export default function ListInfo() {
       </div>
       <div className="stickers-container container">
       {
-        listInfo && listInfo.stickers ? (
-          listInfo.stickers.map((sticker, index) => (
+        listImages ? (
+          listImages.map((sticker, index) => (
             <div key={index}>
               <img className="w-full h-full" src={sticker.url} alt={`sticker-${index}`} />
             </div>
@@ -206,7 +213,7 @@ export default function ListInfo() {
               <span>{listName}</span>
               <span className="ml-[5px]">أضف ملصق لقائمة</span>
             </p>
-            <div className="flex flex-col items-end grow my-[15px] grow">
+            {/* <div className="flex flex-col items-end grow my-[15px] grow">
               <div
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
@@ -231,6 +238,36 @@ export default function ListInfo() {
                     اختر الصورة{" "}
                   </p>
                 </div>
+                {imagesShow}
+              </div>
+            </div> */}
+            <div className="flex flex-col items-end grow my-[15px] grow">
+              <div
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onClick={handleImageClick}
+                onDrop={handleDrop}
+                className="grow relative flex items-center justify-center my-[10px] bg-transparent w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
+              >
+                <input
+                  ref={inputImageRef}
+                  hidden
+                  type="file"
+                  onChange={(e) => setImages([...e.target.files])}
+                  multiple
+                />
+                <div className="flex flex-col items-center">
+                  <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
+                  <p className="text-[12px] md:text-[14px]">
+                    <span className="hidden md:inline-block">
+                      أو اسحبها هنا
+                    </span>{" "}
+                    اختر الصور{" "}
+                  </p>
+                </div>
+              </div>
+              <div className="max-h-[200px] overflow-auto w-full grid grid-cols-3 gap-1.5 justify-between">
                 {imagesShow}
               </div>
             </div>

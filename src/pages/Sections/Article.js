@@ -5,9 +5,13 @@ import axios from "axios";
 import BASE_URL from "../../config";
 
 export default function Article() {
+  // useState
   const [articleInfo, setArticleInfo] = useState([]);
+
+  // useNavigate
   const nav = useNavigate();
 
+  // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const articleName = params.get('article_name');
@@ -15,6 +19,7 @@ export default function Article() {
   const doorId = params.get('section_id');
   const doorName = params.get('door');
 
+  // useEffect
   useEffect(() => {
     axios
       .get(`${BASE_URL}/blogs/${articleId}`, {
@@ -30,7 +35,7 @@ export default function Article() {
 
   return(
     <>
-      <Header disabled="true" />
+      <Header disabled={true} />
       <div className="introduction-box
         text-base
         md:text-2xl

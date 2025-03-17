@@ -8,6 +8,7 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 
 export default function Stickers() {
+  // useState
   const [listModel, setListModel] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [name, setName] = useState("");
@@ -21,17 +22,20 @@ export default function Stickers() {
   const [editListModel, setEditListModel] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [listId, setListId] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
 
+  // useRef
   const inputImageRef = useRef(null);
 
+  // useNavigate
   const nav = useNavigate();
 
+  // Cookies
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken");
 
+  // Functions
   const handleTextDirection = (e) => {
     const value = e.target.value;
     if (/[\u0600-\u06FF]/.test(value)) {
@@ -111,7 +115,7 @@ export default function Stickers() {
 
   const showLists = lists.map((list, index) => (
     <div key={index}
-      onClick={() => nav(`/listinfo?listinfo_id=${list.id}`)}
+      onClick={() => nav(`/listinfo?listinfo_id=${list.id}&listName=${list.name}`)}
       className="list-box cursor-pointer grid grid-cols-2 relative bg-gradient-to-t"
       style={{
         background: "linear-gradient(to bottom, rgba(10,0,37,0.5), rgba(32,32,32,0.2))"
@@ -319,10 +323,10 @@ export default function Stickers() {
     const formData = new FormData();
     formData.append("category_id", categoryId)
     images.forEach((img) => {
-      formData.append("sticker", img);
+      formData.append("stickers[]", img);
     });
     try {
-    const res = await axios.post(`${BASE_URL}/stickers`, formData,{
+    await axios.post(`${BASE_URL}/stickers`, formData,{
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${token}`,
@@ -337,7 +341,7 @@ export default function Stickers() {
 
   return (
     <div className="text-base md:text-xl">
-      <Header disabled="true" />
+      <Header disabled={true} />
       {/* صندوق مدخل إلى الملصقات */}
       <div
         className="introduction-box

@@ -4,20 +4,24 @@ import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 import { useLocation, useNavigate } from "react-router-dom";
-import Button from "../../components/Button/Button";
 
 export default function Tip(){
+  // useState
   const [advice, setAdvice] = useState([]);
 
+  // useNavigate
   const nav = useNavigate();
 
+  // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const tipId = params.get('tip_id');
 
+  // Cookies
   const cookie = new Cookies();
   const token = cookie.get("userAccessToken");
 
+  // useEffect
   useEffect(() => {
     axios.get(`${BASE_URL}/advice/${tipId}`,{
       headers: {
@@ -29,10 +33,9 @@ export default function Tip(){
     .catch((err) => console.log(err));
   }, [])
 
-
   return(
     <div>
-      <Header disabled="true" />
+      <Header disabled={true} />
       <div className="introduction-box
         text-base
         md:text-2xl
