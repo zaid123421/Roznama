@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
 import JoditEditor from "jodit-react";
 import Button from "../../components/Button/Button";
@@ -6,6 +6,10 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function AddBlog() {
   // useState
@@ -13,6 +17,11 @@ export default function AddBlog() {
   const [dragActive, setDragActive] = useState(false);
   const [direction, setDirection] = useState("rtl");
   const [title, setTitle] = useState("");
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   // useRef
   const inputImageRef = useRef(null);
@@ -75,6 +84,18 @@ export default function AddBlog() {
     setDirection("rtl");
   };
 
+  // Configration 
+  const config = {
+    toolbar: [
+      ["bold", "italic", "underline", "strikethrough"],
+      ["fontSize", "alignment", "unorderedList", "orderedList", "size"],
+    ],
+    showCharsCounter: true,
+    showWordsCounter: true,
+    removeButtons: ['hr', "selectall", "paragraph"],
+    disablePlugins: ["Speech Recognize", "image", "file", "video", "table", "link", "print", "line", "color"],
+  };
+
   // Mapping
   const imagesShow = images.map((img, key) => (
     <img
@@ -84,8 +105,22 @@ export default function AddBlog() {
     />
   ));
 
+  // useEffect
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+        if(success) {
+          nav('/sections');
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicatin With Backend
   async function Submit() {
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", contentRef.current);
@@ -100,23 +135,17 @@ export default function AddBlog() {
         Authorization: `Bearer ${token}`,
       },
     });
-    nav('/sections')
-  } catch (error) {
-    console.log(error);
+    setBoxMessage("تم إضافة المقال بنجاح");
+    setBoxImage(successImage);
+    setSuccess(true);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
+    }
   }
-  }
-
-  // Configration 
-  const config = {
-    toolbar: [
-      ["bold", "italic", "underline", "strikethrough"],
-      ["fontSize", "alignment", "unorderedList", "orderedList", "size"],
-    ],
-    showCharsCounter: true,
-    showWordsCounter: true,
-    removeButtons: ['hr', "selectall", "paragraph"],
-    disablePlugins: ["Speech Recognize", "image", "file", "video", "table", "link", "print", "line", "color"],
-  };
 
   return (
     <div className="text-base md:text-xl">
@@ -233,6 +262,8 @@ export default function AddBlog() {
               icon = "true"
           />
       </div>
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
+      {isLoading && <Loading />}
     </div>
   );
 }

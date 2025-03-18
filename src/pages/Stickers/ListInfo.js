@@ -5,6 +5,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function ListInfo() {
   // useState
@@ -15,6 +19,10 @@ export default function ListInfo() {
   const [dragActive, setDragActive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -112,8 +120,18 @@ export default function ListInfo() {
       .catch((err) => console.log(err));
   }, [currentPage, refreshPage]);
 
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicating With Backend
   async function addSticker() {
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("category_id", listId)
     images.forEach((img) => {
@@ -126,15 +144,22 @@ export default function ListInfo() {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       }});
+      setBoxMessage("تم إضافة الملصق بنجاح");
+      setBoxImage(successImage);
       handleStickerModel();
       setRefreshPage((prev) => prev + 1);
-  } catch (error) {
-    console.log(error);
-  }
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleStickerModel();
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
+    }
   }
 
   return(
-    <>
+    <div className="text-base md:text-xl">
       <Header disabled="true"/>
       <div className="introduction-box
         text-base
@@ -327,6 +352,8 @@ export default function ListInfo() {
           label="التالي"
         />
       </div>
-    </>
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
+      {isLoading && <Loading />}
+    </div>
   );
 }

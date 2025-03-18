@@ -5,6 +5,10 @@ import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function Tips() {
   // useState
@@ -14,6 +18,10 @@ export default function Tips() {
   const [advices, setAdvices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -81,8 +89,18 @@ export default function Tips() {
     .catch((err) => console.log(err));
   }, [currentPage, refreshPage])
 
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicating With Backend
   async function handleDeleteTip(id) {
+    setIsLoading(true);
     try{
       await axios.delete(`${BASE_URL}/advice/${id}`, {
         headers: {
@@ -90,11 +108,17 @@ export default function Tips() {
           Authorization: `Bearer ${token}`,
         },
       });
+      setBoxMessage("تم حذف النصيحة بنجاح");
+      setBoxImage(successImage);
       setConfirm(false);
       setRefreshPage(refreshPage + 1);
-    }
-    catch {
-      console.log("Error");
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
@@ -220,6 +244,8 @@ export default function Tips() {
           label="التالي"
         />
       </div>
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
+      {isLoading && <Loading />}
     </div>
   );
 }

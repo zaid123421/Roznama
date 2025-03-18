@@ -4,7 +4,6 @@ import Tips from "./pages/Tips/Tips";
 import Sections from "./pages/Sections/Sections";
 import Section from "./pages/Sections/Section";
 import AddBlog from "./pages/Sections/AddBlog";
-
 import "../src/pages/Sections/Editor.css"
 import ListInfo from "./pages/Stickers/ListInfo";
 import Login from "./pages/Authntication/Login";

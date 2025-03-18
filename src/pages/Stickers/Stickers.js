@@ -6,6 +6,10 @@ import "./Sticker.css";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function Stickers() {
   // useState
@@ -24,6 +28,10 @@ export default function Stickers() {
   const [listId, setListId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useRef
   const inputImageRef = useRef(null);
@@ -252,8 +260,18 @@ export default function Stickers() {
       .catch((err) => console.log(err));
   }, [currentPage, refreshPage]);
 
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicating With Backend
   async function Submit() {
+    setIsLoading(true);
     try {
       await axios.post(
         `${BASE_URL}/categories`,
@@ -267,16 +285,24 @@ export default function Stickers() {
           },
         }
       );
-        handleListModel();
-        setRefreshPage((prev) => prev + 1);
-    } catch (error) {
-      console.log(error);
+      setBoxMessage("تم إضافة قائمة الملصقات بنجاح");
+      setBoxImage(successImage);
+      handleListModel();
+      setRefreshPage((prev) => prev + 1);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleListModel();
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
   async function Edit() {
+    setIsLoading(true);
     try {
-      const res = await axios.put(
+      await axios.put(
         `${BASE_URL}/categories/${categoryId}`,
         {
           name: name,
@@ -288,19 +314,24 @@ export default function Stickers() {
           },
         }
       );
-      if (res.status === 200) {
-        console.log("Yes !");
-        handleEditListModel();
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
+      setBoxMessage("تم تعديل قائمة الملصقات بنجاح");
+      setBoxImage(successImage);
+      handleEditListModel();
+      setRefreshPage((prev) => prev + 1);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleEditListModel();
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
   async function handleDeleteList(id) {
+    setIsLoading(true);
     try {
-      const res = await axios.delete(
+      await axios.delete(
         `${BASE_URL}/categories/${id}`,
         {
           headers: {
@@ -309,33 +340,46 @@ export default function Stickers() {
           },
         }
       );
-      if (res.status === 204) {
-        console.log("Yes !");
-        setConfirm(false);
-        setRefreshPage((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.log(error);
+      setBoxMessage("تم حذف قائمة الملصقات بنجاح");
+      setBoxImage(successImage);
+      setConfirm(false);
+      setRefreshPage((prev) => prev + 1);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
   async function addSticker() {
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("category_id", categoryId)
     images.forEach((img) => {
       formData.append("stickers[]", img);
     });
     try {
-    await axios.post(`${BASE_URL}/stickers`, formData,{
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    });
+    await axios.post(`${BASE_URL}/stickers`, formData,
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setBoxMessage("تم إضافة الملصقات للقائمة بنجاح");
+      setBoxImage(successImage);
       handleStickerModel();
       setRefreshPage((prev) => prev + 1);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleStickerModel();
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
@@ -680,6 +724,8 @@ export default function Stickers() {
           label="التالي"
         />
       </div>
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
+      {isLoading && <Loading />}
     </div>
   );
 }

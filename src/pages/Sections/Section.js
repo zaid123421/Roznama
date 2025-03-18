@@ -5,6 +5,10 @@ import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 import Button from "../../components/Button/Button";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function Section() {
   // useState
@@ -19,6 +23,10 @@ export default function Section() {
   const [lastPage, setLastPage] = useState(null);
   const [currentPageBlog, setCurrentPageBlog] = useState(1);
   const [lastPageBlog, setLastPageBlog] = useState(null);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -179,8 +187,18 @@ export default function Section() {
       });
   }, [currentPageBlog, searchQuery]);
 
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicating With Backend
   async function handleDelete(id) {
+    setIsLoading(true);
     try {
       await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
@@ -188,10 +206,18 @@ export default function Section() {
           Authorization: `Bearer ${token}`,
         },
       });
+      setBoxMessage("تم حذف المقال بنجاح");
+      setBoxImage(successImage);
       setRefreshPage(refreshPage + 1);
       setConfirm(false);
     } catch {
-      console.log("Error");
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+    } 
+    finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
@@ -264,8 +290,7 @@ export default function Section() {
         </div>
       }
       {confirm &&
-      <div
-        className="insert-box
+      <div className="insert-box
         px-[15px]
         inset-0
         bg-black
@@ -312,8 +337,8 @@ export default function Section() {
       </div>
       }
       {/* Pagination */}
-      {searchQuery.length === 0 ? (
-        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+      {searchQuery.length === 0
+      ? <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
           <Button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
@@ -338,38 +363,40 @@ export default function Section() {
             label="التالي"
           />
         </div>
-      ) : (
-        ""
-      )}
-      {searchQuery.length !== 0 ? (
-        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
-          <Button
-            onClick={handlePrevPageBlog}
-            disabled={currentPageBlog === 1}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPageBlog === 1
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="السابق"
-          />
-          <span className="text-lg font-bold">
-            {currentPageBlog} / {lastPageBlog}
-          </span>
-          <Button
-            onClick={handleNextPageBlog}
-            disabled={currentPageBlog === lastPageBlog}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPageBlog === lastPageBlog
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="التالي"
-          />
-        </div>
-      ) : (
-        ""
-      )}
+      : <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+      <Button
+        onClick={handlePrevPageBlog}
+        disabled={currentPageBlog === 1}
+        className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+          currentPageBlog === 1
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-400"
+        }`}
+        label="السابق"
+      />
+      <span className="text-lg font-bold">
+        {currentPageBlog} / {lastPageBlog}
+      </span>
+      <Button
+        onClick={handleNextPageBlog}
+        disabled={currentPageBlog === lastPageBlog}
+        className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+          currentPageBlog === lastPageBlog
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-400"
+        }`}
+        label="التالي"
+      />
+      </div>}
+      {isBoxOpen &&
+      <Model
+        message={boxMessage}
+        imageSrc={boxImage}
+      />
+      }
+      {isLoading && 
+        <Loading />
+      }
     </div>
   );
 }

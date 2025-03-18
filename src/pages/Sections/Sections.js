@@ -299,11 +299,10 @@ export default function Sections() {
       setBoxImage(successImage);
       handleDoorModelState();
       setRefreshPage((prev) => prev + 1);
-    } catch (error) {
+    } catch {
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleDoorModelState();
-      console.log(error);
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -311,7 +310,7 @@ export default function Sections() {
   }
 
   async function Edit() {
-    console.log(sectionId);
+    setIsLoading(true);
     try {
       await axios.put(
         `${BASE_URL}/sections/${sectionId}`,
@@ -326,14 +325,22 @@ export default function Sections() {
           },
         }
       );
+      setBoxMessage("تم تعديل الباب بنجاح");
+      setBoxImage(successImage);
       handleEditDoorModelState();
       setRefreshPage((prev) => prev + 1);
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleDoorModelState();
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
   async function handleDeleteDoor(id) {
+    setIsLoading(true);
     try {
       await axios.delete(`${BASE_URL}/sections/${id}`, {
         headers: {
@@ -341,14 +348,22 @@ export default function Sections() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setRefreshPage(refreshPage + 1);
+      setBoxMessage("تم حذف الباب بنجاح");
+      setBoxImage(successImage);
+      setRefreshPage((prev) => prev + 1);
       setConfirmDoor(false);
     } catch {
-      console.log("Error");
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirmDoor(false);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
   async function handleDelete(id) {
+    setIsLoading(true);
     try {
       await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: {
@@ -356,10 +371,17 @@ export default function Sections() {
           Authorization: `Bearer ${token}`,
         },
       });
+      setBoxMessage("تم حذف المقال بنجاح");
+      setBoxImage(successImage);
       setFilteredBlogs((prev) => prev.filter((blog) => blog.id !== id));
       setConfirm(false);
     } catch {
-      console.log("Error");
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
@@ -701,73 +723,60 @@ export default function Sections() {
         </div>
       )}
       {/* Pagination */}
-      {searchQuery.length === 0 ? (
-        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
-          <Button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPage === 1
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="السابق"
-          />
-          <span className="text-lg font-bold">
-            {currentPage} / {lastPage}
-          </span>
-          <Button
-            onClick={handleNextPage}
-            disabled={currentPage === lastPage}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPage === lastPage
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="التالي"
-          />
-        </div>
-      ) : (
-        ""
-      )}
-      {searchQuery.length !== 0 ? (
-        <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
-          <Button
-            onClick={handlePrevPageBlog}
-            disabled={currentPageBlog === 1}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPageBlog === 1
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="السابق"
-          />
-          <span className="text-lg font-bold">
-            {currentPageBlog} / {lastPageBlog}
-          </span>
-          <Button
-            onClick={handleNextPageBlog}
-            disabled={currentPageBlog === lastPageBlog}
-            className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-              currentPageBlog === lastPageBlog
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-gray-400"
-            }`}
-            label="التالي"
-          />
-        </div>
-      ) : (
-        ""
-      )}
-      {isBoxOpen && (
-      <Model
-        message={boxMessage}
-        imageSrc={boxImage}
+      {searchQuery.length === 0
+      ? <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+        <Button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="السابق"
+        />
+        <span className="text-lg font-bold">
+          {currentPage} / {lastPage}
+        </span>
+        <Button
+          onClick={handleNextPage}
+          disabled={currentPage === lastPage}
+          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+            currentPage === lastPage
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-gray-400"
+          }`}
+          label="التالي"
+        />
+      </div>
+      : <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
+      <Button
+        onClick={handlePrevPageBlog}
+        disabled={currentPageBlog === 1}
+        className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+          currentPageBlog === 1
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-400"
+        }`}
+        label="السابق"
       />
-      )}
-      {isLoading && (
-        <Loading />
-      )}
+      <span className="text-lg font-bold">
+        {currentPageBlog} / {lastPageBlog}
+      </span>
+      <Button
+        onClick={handleNextPageBlog}
+        disabled={currentPageBlog === lastPageBlog}
+        className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
+          currentPageBlog === lastPageBlog
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-400"
+        }`}
+        label="التالي"
+      />
+      </div>
+      }
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
+      {isLoading && <Loading />}
     </div>
   );
 }
