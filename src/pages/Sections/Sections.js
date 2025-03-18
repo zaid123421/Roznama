@@ -6,6 +6,10 @@ import BASE_URL from "../../config";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Cookies from "universal-cookie";
+import successImage from '../../assets/success.gif';
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
+import Loading from "../../components/Models/Loading";
 
 export default function Sections() {
   // useState
@@ -29,6 +33,10 @@ export default function Sections() {
   const [lastPage, setLastPage] = useState(null);
   const [currentPageBlog, setCurrentPageBlog] = useState(1);
   const [lastPageBlog, setLastPageBlog] = useState(null);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -217,7 +225,7 @@ export default function Sections() {
 
   // useEffect
   useEffect(() => {
-    if (doorModelState || editDoorModelState || confirm || confirmDoor) {
+    if (doorModelState || editDoorModelState || confirm || confirmDoor || isBoxOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -225,7 +233,7 @@ export default function Sections() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [doorModelState, editDoorModelState, confirm, confirmDoor]);
+  }, [doorModelState, editDoorModelState, confirm, confirmDoor, isBoxOpen]);
 
   useEffect(() => {
     axios
@@ -261,8 +269,18 @@ export default function Sections() {
       });
   }, [currentPageBlog, searchQuery]);
 
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
+
   // Communicating With Backend
   async function Submit() {
+    setIsLoading(true);
     try {
       await axios.post(
         `${BASE_URL}/sections`,
@@ -277,13 +295,18 @@ export default function Sections() {
           },
         }
       );
+      setBoxMessage("تم إضافة الباب بنجاح");
+      setBoxImage(successImage);
       handleDoorModelState();
       setRefreshPage((prev) => prev + 1);
     } catch (error) {
-      console.error(
-        "Error:",
-        error.response ? error.response.data : error.message
-      );
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      handleDoorModelState();
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+      setIsBoxOpen(true);
     }
   }
 
@@ -344,8 +367,7 @@ export default function Sections() {
     <div className="text-base md:text-xl">
       <Header onSearch={handleSearch} />
       {/* صندوق المدخل إلى الأبواب وزر إمكانية إضافة الباب */}
-      <div
-        className="introduction-box
+      <div className="introduction-box
         text-base
         md:text-2xl
         flex
@@ -395,7 +417,7 @@ export default function Sections() {
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
             className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
-            <p className="flex justify-end pb-[10px] font-bold">إضافة باب</p>
+            <p className="flex justify-end pb-[10px] font-bold">إضافة باب بنجاح</p>
             <div className="flex flex-col ">
               <span className="flex justify-end mb-[5px]">اسم الباب</span>
               <input
@@ -736,6 +758,15 @@ export default function Sections() {
         </div>
       ) : (
         ""
+      )}
+      {isBoxOpen && (
+      <Model
+        message={boxMessage}
+        imageSrc={boxImage}
+      />
+      )}
+      {isLoading && (
+        <Loading />
       )}
     </div>
   );
