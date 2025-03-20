@@ -23,6 +23,8 @@ export default function ListInfo() {
   const [boxImage, setBoxImage] = useState("");
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
+
 
   // useNavigate
   const nav = useNavigate();
@@ -124,6 +126,9 @@ export default function ListInfo() {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -137,7 +142,6 @@ export default function ListInfo() {
     images.forEach((img) => {
       formData.append("stickers[]", img);
     });
-    console.log(images);
     try {
       await axios.post(`${BASE_URL}/stickers`, formData,{
       headers: {
@@ -148,10 +152,13 @@ export default function ListInfo() {
       setBoxImage(successImage);
       handleStickerModel();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleStickerModel();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);

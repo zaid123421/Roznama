@@ -24,7 +24,7 @@ export default function EditBlog() {
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useRef
   const inputImageRef = useRef(null);
@@ -140,6 +140,8 @@ export default function EditBlog() {
         setIsBoxOpen(false);
         if(success) {
           nav(`/section?section_id=${articleInfo.section_id}&section_name=${sectionName}`)
+        } else if(unautherized) {
+          nav('/')
         }
       }, 3000);
       return () => clearTimeout(timer);
@@ -168,9 +170,12 @@ export default function EditBlog() {
     setBoxMessage("تم تعديل المقال بنجاح");
     setBoxImage(successImage);
     setSuccess(true);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);

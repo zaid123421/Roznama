@@ -37,6 +37,7 @@ export default function Sections() {
   const [boxImage, setBoxImage] = useState("");
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -273,6 +274,9 @@ export default function Sections() {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -299,10 +303,13 @@ export default function Sections() {
       setBoxImage(successImage);
       handleDoorModelState();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleDoorModelState();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -329,10 +336,13 @@ export default function Sections() {
       setBoxImage(successImage);
       handleEditDoorModelState();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleDoorModelState();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -352,10 +362,13 @@ export default function Sections() {
       setBoxImage(successImage);
       setRefreshPage((prev) => prev + 1);
       setConfirmDoor(false);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirmDoor(false);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -375,10 +388,13 @@ export default function Sections() {
       setBoxImage(successImage);
       setFilteredBlogs((prev) => prev.filter((blog) => blog.id !== id));
       setConfirm(false);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirm(false);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);

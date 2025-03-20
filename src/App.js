@@ -19,18 +19,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>} />
           <Route element={<RequireAuth />}>
-          <Route path="/sections" element={<Sections />}>
-          </Route>
+          <Route path="/sections" element={<Sections />} />
             <Route path="/section" element={<Section />} />
             <Route path="/article" element={<Article />} />
-              <Route path="/AddBlog" element={<AddBlog />} />
-              <Route path="/EditBlog" element={<EditBlog />} />
+            <Route path="/AddBlog" element={<AddBlog />} />
+            <Route path="/EditBlog" element={<EditBlog />} />
             <Route path="/stickers" element={<Stickers />} />
             <Route path="/listinfo" element={<ListInfo />} />
-            <Route path="/tips" element={<Tips />} >
-              <Route path="/tips/tip" element={<Tip />} />
-              <Route path="/tips/reminders" element={<Reminders />} />
-            </Route>
+            <Route path="/tips" element={<Tips />} />
+            <Route path="/tip" element={<Tip />} />
+            <Route path="/reminders" element={<Reminders />} />
           </Route>
       </Routes>
     </div>

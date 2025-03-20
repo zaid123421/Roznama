@@ -4,10 +4,17 @@ import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
 import { useLocation, useNavigate } from "react-router-dom";
+import failureImage from '../../assets/failure.png'
+import Model from "../../components/Models/Model";
 
 export default function Tip(){
   // useState
   const [advice, setAdvice] = useState([]);
+  const [boxMessage, setBoxMessage] = useState("");
+  const [boxImage, setBoxImage] = useState("");
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -30,8 +37,29 @@ export default function Tip(){
       },
     })
     .then((data) => setAdvice(data.data.data))
-    .catch((err) => console.log(err));
-  }, [])
+    .catch((err) => {
+      console.log(err)
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+      setIsBoxOpen(true);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
+    })
+  }, []);
+
+  useEffect(() => {
+    if (isBoxOpen) {
+      const timer = setTimeout(() => {
+        setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isBoxOpen]);
 
   return(
     <div>
@@ -80,6 +108,7 @@ export default function Tip(){
           {advice.length !== 0 ? advice.content : ""}
         </div>
       </div>
+      {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
     </div>
   );
 }

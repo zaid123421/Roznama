@@ -23,6 +23,7 @@ export default function Tips() {
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [list, setList] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -85,15 +86,26 @@ export default function Tips() {
     })
     .then((data) => {
       setAdvices(data.data.data);
-      setLastPage(data.data.meta.last_page)
+      setLastPage(data.data.meta.last_page);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+      setIsBoxOpen(true);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
+    })
   }, [currentPage, refreshPage])
 
   useEffect(() => {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -113,10 +125,13 @@ export default function Tips() {
       setBoxImage(successImage);
       setConfirm(false);
       setRefreshPage(refreshPage + 1);
-    } catch {
+    } catch (err) {
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirm(false);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);

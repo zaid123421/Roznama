@@ -32,6 +32,7 @@ export default function Stickers() {
   const [boxImage, setBoxImage] = useState("");
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useRef
   const inputImageRef = useRef(null);
@@ -264,6 +265,9 @@ export default function Stickers() {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -289,10 +293,13 @@ export default function Stickers() {
       setBoxImage(successImage);
       handleListModel();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleListModel();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -318,10 +325,13 @@ export default function Stickers() {
       setBoxImage(successImage);
       handleEditListModel();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleEditListModel();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -344,10 +354,13 @@ export default function Stickers() {
       setBoxImage(successImage);
       setConfirm(false);
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirm(false);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -373,10 +386,13 @@ export default function Stickers() {
       setBoxImage(successImage);
       handleStickerModel();
       setRefreshPage((prev) => prev + 1);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       handleStickerModel();
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);

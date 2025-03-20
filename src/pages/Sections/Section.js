@@ -27,6 +27,7 @@ export default function Section() {
   const [boxImage, setBoxImage] = useState("");
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -191,6 +192,9 @@ export default function Section() {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -210,12 +214,14 @@ export default function Section() {
       setBoxImage(successImage);
       setRefreshPage(refreshPage + 1);
       setConfirm(false);
-    } catch {
+    } catch (err){
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirm(false);
-    } 
-    finally {
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
+    } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
     }
