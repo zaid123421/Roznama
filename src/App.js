@@ -11,6 +11,7 @@ import RequireAuth from "./pages/Authntication/RequireAuth";
 import Article from "./pages/Sections/Article";
 import EditBlog from "./pages/Sections/EditBlog";
 import Tip from "./pages/Tips/Tip";
+import Reminders from "./pages/Reminders/Reminders";
 
 function App() {
   return (
@@ -18,15 +19,18 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>} />
           <Route element={<RequireAuth />}>
-            <Route path="/sections" element={<Sections />} />
+          <Route path="/sections" element={<Sections />}>
+          </Route>
+            <Route path="/section" element={<Section />} />
             <Route path="/article" element={<Article />} />
-            <Route path="/door" element={<Section />} />
-            <Route path="/AddBlog" element={<AddBlog />} />
-            <Route path="/EditBlog" element={<EditBlog />} />
+              <Route path="/AddBlog" element={<AddBlog />} />
+              <Route path="/EditBlog" element={<EditBlog />} />
             <Route path="/stickers" element={<Stickers />} />
             <Route path="/listinfo" element={<ListInfo />} />
-            <Route path="/tips" element={<Tips />} />
-            <Route path="/tip" element={<Tip />} />
+            <Route path="/tips" element={<Tips />} >
+              <Route path="/tips/tip" element={<Tip />} />
+              <Route path="/tips/reminders" element={<Reminders />} />
+            </Route>
           </Route>
       </Routes>
     </div>

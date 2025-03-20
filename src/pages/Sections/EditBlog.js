@@ -36,8 +36,8 @@ export default function EditBlog() {
   // useLocation
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const doorId = params.get('article_id');
-  const doorName = params.get('door');
+  const articleId = params.get('article_id');
+  const sectionName = params.get('section_name');
 
   // Cookies
   const cookie = new Cookies();
@@ -122,7 +122,7 @@ export default function EditBlog() {
 
   // useEffect
   useEffect(() => {
-    axios.get(`${BASE_URL}/blogs/${doorId}`)
+    axios.get(`${BASE_URL}/blogs/${articleId}`)
     .then((data) => {
       setArticleInfo(data.data.data);
       setTitle(data.data.data.title);
@@ -132,14 +132,14 @@ export default function EditBlog() {
       }
     })
     .catch((error) => console.log(error))
-  }, [doorId])
+  }, [articleId])
 
   useEffect(() => {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
         if(success) {
-          nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)
+          nav(`/section?section_id=${articleInfo.section_id}&section_name=${sectionName}`)
         }
       }, 3000);
       return () => clearTimeout(timer);
@@ -159,7 +159,7 @@ export default function EditBlog() {
       });
     }
     try {
-      await axios.post(`${BASE_URL}/blogs/${Number(doorId)}`, formData,{
+      await axios.post(`${BASE_URL}/blogs/${Number(articleId)}`, formData,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
@@ -195,7 +195,7 @@ export default function EditBlog() {
         py-[15px]"
       >
         <div className="flex flex-row-reverse items-center">
-        <button onClick={()=> nav(`/door?section_id=${articleInfo.section_id}&door_name=${doorName}`)}
+        <button onClick={()=> nav(`/section?section_id=${articleInfo.section_id}&section_name=${sectionName}`)}
           className="
           ml-[10px]
           md:ml-[25px]

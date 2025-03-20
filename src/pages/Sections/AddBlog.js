@@ -34,7 +34,7 @@ export default function AddBlog() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const sectionId = params.get('section_id');
-  const sectionName = params.get('door');
+  const sectionName = params.get('section_name');
 
   // Cookies
   const cookie = new Cookies();

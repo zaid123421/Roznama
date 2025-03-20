@@ -104,7 +104,7 @@ export default function Sections() {
     <div
       key={index}
       onClick={(e) =>
-        nav(`/door?section_id=${section.id}&door_name=${section.name}`)
+        nav(`/section?section_id=${section.id}&section_name=${section.name}`)
       }
       className="door-box cursor-pointer flex flex-col justify-between"
     >
@@ -169,7 +169,7 @@ export default function Sections() {
           onClick={(e) => {
             setSectionId(section.id);
             e.stopPropagation();
-            nav(`/addBlog?section_id=${section.id}&door=${section.name}`);
+            nav(`/addBlog?section_id=${section.id}&section_name=${section.name}`);
           }}
           className="bg-[#3FAB21]
           border-2
@@ -415,8 +415,8 @@ export default function Sections() {
           إضافة باب
           <i className="fa-solid fa-plus ml-[10px]" />
         </button>
-        <div className="ml-[20px] md:ml-[50px]">
-          <span className="font-semibold mr-[10px]">الأبواب</span>
+        <div className="ml-[20px] md:ml-[30px]">
+          <span className="font-semibold mr-[10px] font-extrabold">الأبواب</span>
           <i className="fa-solid fa-door-open"></i>
         </div>
       </div>

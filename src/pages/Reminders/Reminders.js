@@ -10,7 +10,8 @@ import failureImage from '../../assets/failure.png'
 import Model from "../../components/Models/Model";
 import Loading from "../../components/Models/Loading";
 
-export default function Tips() {
+export default function Reminders() {
+
   // useState
   const [confirm, setConfirm] = useState(false);
   const [adviceId, setAdviceId] = useState(null);
@@ -158,13 +159,13 @@ export default function Tips() {
           <i className="fa-solid fa-chevron-down ml-[10px] text-sm text-[#7F7F7F]"/>
           {list &&
           <ul className="bg-white absolute left-0 w-full top-[34px]">
-            <li className="p-2 border-b-2 rounded-md bg-gray-300">النصائح</li>
-            <li onClick={() => nav(`/tips/reminders`)} className="p-2 rounded-md hover:bg-gray-300 duration-300">التذكيرات</li>
+            <li onClick={() => nav(`/tips`)} className="p-2 border-b-2 rounded-md hover:bg-gray-300 duration-300">النصائح</li>
+            <li className="p-2 rounded-md bg-gray-300">التذكيرات</li>
           </ul>
           }
         </button>
         <div className="ml-[20px] md:ml-[30px]">
-          <span className="font-semibold mr-[10px] font-extrabold">النصائح</span>
+          <span className="font-semibold mr-[10px] font-extrabold">التذكيرات</span>
         </div>
       </div>
       {/* صندوق محتوى الصفحة والجدول */}
@@ -174,7 +175,7 @@ export default function Tips() {
             <tr className="text-[#535763]">
               <th className="w-1/8 pb-[15px]">حذف</th>
               <th className="w-1/8 pb-[15px]">التاريخ</th>
-              <th className="w-3/4 pb-[15px] text-end">النصيحة</th>
+              <th className="w-3/4 pb-[15px] text-end">التذكير</th>
             </tr>
           </thead>
           <tbody>
@@ -200,7 +201,7 @@ export default function Tips() {
             style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
             className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
           >
-            <p className="text-right">هل تريد بالتأكيد حذف النصيحة ؟</p>
+            <p className="text-right">هل تريد بالتأكيد حذف التذكير ؟</p>
             <div className="flex justify-between mt-[50px]">
               <Button className="bg-green-600
                 text-white

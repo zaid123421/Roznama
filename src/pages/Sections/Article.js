@@ -16,8 +16,8 @@ export default function Article() {
   const params = new URLSearchParams(location.search);
   const articleName = params.get('article_name');
   const articleId = params.get('article_id');
-  const doorId = params.get('section_id');
-  const doorName = params.get('door');
+  const sectionId = params.get('section_id');
+  const sectionName = params.get('section_name');
 
   // useEffect
   useEffect(() => {
@@ -51,10 +51,10 @@ export default function Article() {
         py-[15px]"
       >
         <div className="flex items-center">
-          <p className="font-semibold mr-[10px] text-right">{doorName} / {articleName}</p>
+          <p className="font-semibold mr-[10px] text-right">{sectionName} / {articleName}</p>
           <i className="fa-solid fa-door-open"></i>
         </div>
-        <button onClick={() => nav(`/door?section_id=${doorId}&door_name=${doorName}`)}
+        <button onClick={() => nav(`/section?section_id=${sectionId}&section_name=${sectionName}`)}
           className="
           ml-[10px]
           md:ml-[25px]

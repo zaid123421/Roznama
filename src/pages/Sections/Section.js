@@ -35,7 +35,7 @@ export default function Section() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const sectionId = params.get('section_id');
-  const doorName = params.get('door_name');
+  const sectionName = params.get('section_name');
 
   // Cookies
   const cookie = new Cookies();
@@ -72,10 +72,10 @@ export default function Section() {
 
   // Mapping
   const showDoor = Array.isArray(doorInfo) && doorInfo.length > 0 ? doorInfo.map((door, index) => (
-    <tr onClick={() => {nav(`/article?article_id=${door.id}&article_name=${door.title}&door=${doorName}&section_id=${sectionId}`);}} className="border-2 border-[#AEAEAE] cursor-pointer" key={index}>
+    <tr onClick={() => {nav(`/article?article_id=${door.id}&article_name=${door.title}&section_name=${sectionName}&section_id=${sectionId}`);}} className="border-2 border-[#AEAEAE] cursor-pointer" key={index}>
       <td className="text-center px-[5px]">
       <i
-      onClick={(e) => {e.stopPropagation();nav(`/EditBlog?article_id=${door.id}&door=${doorName}`)}}
+      onClick={(e) => {e.stopPropagation();nav(`/EditBlog?article_id=${door.id}&section_name=${sectionName}`)}}
       className="fa-solid
           fa-wand-magic
           w-[30px]
@@ -240,7 +240,7 @@ export default function Section() {
         py-[15px]"
       >
         <div className="flex items-center">
-          <p className="font-semibold mr-[10px] text-right">{doorName}</p>
+          <p className="font-semibold mr-[10px] text-right">{sectionName}</p>
           <i className="fa-solid fa-door-open"></i>
         </div>
         <button onClick={() => nav('/sections')}
