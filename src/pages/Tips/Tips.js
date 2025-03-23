@@ -174,7 +174,7 @@ export default function Tips() {
           {list &&
           <ul className="bg-white absolute left-0 w-full top-[34px]">
             <li className="p-2 border-b-2 rounded-md bg-gray-300">النصائح</li>
-            <li onClick={() => nav(`/tips/reminders`)} className="p-2 rounded-md hover:bg-gray-300 duration-300">التذكيرات</li>
+            <li onClick={() => nav(`/reminders`)} className="p-2 rounded-md hover:bg-gray-300 duration-300">التذكيرات</li>
           </ul>
           }
         </button>

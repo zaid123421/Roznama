@@ -403,6 +403,29 @@ export default function Section() {
       {isLoading && 
         <Loading />
       }
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          nav(`/addBlog?section_id=${sectionId}&section_name=${sectionName}`);
+        }}
+        className="bg-[#3FAB21]
+        border-2
+        border-[#3FAB21]
+        rounded-[10px]
+        px-[8px]
+        md:px-[14px]
+        py-[4px]
+        text-white
+        hover:text-black
+        hover:bg-transparent
+        duration-300
+        fixed
+        bottom-[50px]
+        left-[50px]"
+      >
+        إضافة مقال
+        <i className="fa-solid fa-plus ml-[10px]" />
+      </button>
     </div>
   );
 }

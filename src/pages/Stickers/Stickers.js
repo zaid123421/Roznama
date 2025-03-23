@@ -537,7 +537,16 @@ export default function Stickers() {
               <span>{listName}</span>
               <span className="ml-[5px]">أضف ملصق لقائمة</span>
             </p>
-            <div className="flex flex-col items-end grow my-[15px] grow">
+              <ul className="flex flex-col text-right text-[12px] md:text-[14px]">
+                <li>
+                الحد الأقصى المسموح به للصور هو 20 صورة
+                </li>
+                <li>
+                <span>2MB </span>
+                الحجم الأقصى المسموح به للصورة هو
+                </li>
+              </ul>
+            <div className="flex flex-col items-end grow grow">
               <div
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
@@ -562,6 +571,9 @@ export default function Stickers() {
                     اختر الصور{" "}
                   </p>
                 </div>
+              </div>
+              <div className="text-center md:text-[16px] font-extrabold w-full my-[15px]">
+                {images.length} / 20
               </div>
               <div className="max-h-[200px] overflow-auto w-full grid grid-cols-3 gap-1.5 justify-between">
                 {imagesShow}

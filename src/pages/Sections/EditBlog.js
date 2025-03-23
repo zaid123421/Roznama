@@ -126,7 +126,7 @@ export default function EditBlog() {
     .then((data) => {
       setArticleInfo(data.data.data);
       setTitle(data.data.data.title);
-      contentRef.current = data.data.data.html_free_content;
+      contentRef.current = data.data.data.content;
       if (data.data.data.images && data.data.data.images.length > 0) {
         setImages(data.data.data.images);
       }
@@ -181,6 +181,8 @@ export default function EditBlog() {
       setIsBoxOpen(true);
     }
   }
+
+  console.log(articleInfo);
 
   return (
     <div className="text-base md:text-xl">

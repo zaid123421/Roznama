@@ -31,7 +31,7 @@ export default function Article() {
       .catch((err) => console.log(err));
   }, []);
 
-  const text = articleInfo.html_free_content;
+  const text = articleInfo.content;
 
   return(
     <>
@@ -69,12 +69,15 @@ export default function Article() {
       </div>
       <div className="px-[10px]">
         <div className="container bg-[#f1f1f1] overflow-hidden m-auto px-[10px] md:px-[25px] py-[10px] md:py-[25px] my-[20px] rounded-3xl text-right"
-        style={{ boxShadow: "0px 7px 20px 0px rgba(0, 0, 0, 0.25)" }}
-        >
+        style={{ boxShadow: "0px 7px 20px 0px rgba(0, 0, 0, 0.25)" }} >
           {articleInfo.length !== 0 && articleInfo.images.length !== 0 &&
           <img className="w-full rounded-2xl" src = {articleInfo.images[0].url} alt="article"/>}
           <h1 className="mt-[25px] text-[30px] text-[#3769AE] underline">{articleInfo.title}</h1>
-          <div className="mt-[20px] text-[20px] leading-10" dangerouslySetInnerHTML={{ __html: text }} />
+          <pre
+          className="mt-[20px] text-[20px] leading-10"
+          dangerouslySetInnerHTML={{ __html: text }}
+          style={{  fontFamily: "Cairo, serif" }}
+          />
         </div>
       </div>
     </>

@@ -110,7 +110,7 @@ export default function ListInfo() {
 
   useEffect(() => {
     axios
-      .get(`${BASE_URL}/stickers/?page=${currentPage}&perPage=10`, {
+      .get(`${BASE_URL}/stickers?page=${currentPage}&perPage=10&category_id=${listId}`, {
         headers: {
           Accept: "application/json",
         },
@@ -245,35 +245,16 @@ export default function ListInfo() {
               <span>{listName}</span>
               <span className="ml-[5px]">أضف ملصق لقائمة</span>
             </p>
-            {/* <div className="flex flex-col items-end grow my-[15px] grow">
-              <div
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onClick={handleImageClick}
-                onDrop={handleDrop}
-                className="grow relative flex items-center justify-center my-[10px] bg-transparent w-full md:w-[375px] h-[175px] md:h-[225px] border-2 border-dashed border-[#AEAEAE] rounded-[15px] self-center cursor-pointer"
-              >
-                <input
-                  ref={inputImageRef}
-                  hidden
-                  type="file"
-                  onChange={(e) => setImages([...e.target.files])}
-                  multiple
-                />
-                <div className="flex flex-col items-center">
-                  <i className="fa-solid fa-image text-[#7F7F7F] text-[30px] md:text-[60px] mb-[10px]"></i>
-                  <p className="text-[12px] md:text-[14px]">
-                    <span className="hidden md:inline-block">
-                      أو اسحبها هنا
-                    </span>{" "}
-                    اختر الصورة{" "}
-                  </p>
-                </div>
-                {imagesShow}
-              </div>
-            </div> */}
-            <div className="flex flex-col items-end grow my-[15px] grow">
+              <ul className="flex flex-col text-right text-[12px] md:text-[14px]">
+                <li>
+                الحد الأقصى المسموح به للصور هو 20 صورة
+                </li>
+                <li>
+                <span>2MB </span>
+                الحجم الأقصى المسموح به للصورة هو
+                </li>
+              </ul>
+            <div className="flex flex-col items-end grow grow">
               <div
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
@@ -298,6 +279,9 @@ export default function ListInfo() {
                     اختر الصور{" "}
                   </p>
                 </div>
+              </div>
+              <div className="text-center md:text-[16px] font-extrabold w-full my-[15px]">
+                {images.length} / 20
               </div>
               <div className="max-h-[200px] overflow-auto w-full grid grid-cols-3 gap-1.5 justify-between">
                 {imagesShow}
