@@ -9,6 +9,7 @@ import successImage from '../../assets/success.gif';
 import failureImage from '../../assets/failure.png'
 import Model from "../../components/Models/Model";
 import Loading from "../../components/Models/Loading";
+import Pagination from "../../components/Models/Pagination";
 
 export default function Reminders() {
 
@@ -127,7 +128,7 @@ export default function Reminders() {
   return (
     <div className="text-base md:text-xl">
       <Header disabled="true" />
-      {/* صندوق مدخل إلى النصائح */}
+      {/* صندوق مدخل إلى التذكيرات */}
       <div className="introduction-box
         text-base
         md:text-2xl
@@ -232,31 +233,13 @@ export default function Reminders() {
       </div>
       }
       {/* Pagination */}
-      <div className="flex items-center justify-center gap-4 mt-4 mb-[15px]">
-        <Button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-            currentPage === 1
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-400"
-          }`}
-          label="السابق"
-        />
-        <span className="text-lg font-bold">
-          {currentPage} / {lastPage}
-        </span>
-        <Button
-          onClick={handleNextPage}
-          disabled={currentPage === lastPage}
-          className={`px-4 py-2 rounded-2xl duration-300 bg-gray-300 ${
-            currentPage === lastPage
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-gray-400"
-          }`}
-          label="التالي"
-        />
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        lastPage={lastPage}
+        onPrevPage={handlePrevPage}
+        onNextPage={handleNextPage}
+      />
+      {/* Models */}
       {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
       {isLoading && <Loading />}
     </div>
