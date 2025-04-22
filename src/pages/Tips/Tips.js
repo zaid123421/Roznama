@@ -71,8 +71,10 @@ export default function Tips() {
       <td className="text-center p-[10px] text-[12px] md:text-[16px]">
         {(advice.created_at).slice(0, 10)}
       </td>
-      <td className="text-[14px] md:text-[18px] text-end md:text-center p-[10px] py-[20px] md:pl-[50px] font-bold">
-        {advice.content.length < 50 ? advice.content : "..." + advice.content.slice(0, 50)}
+      <td className="text-[14px] md:text-[18px] text-end  p-[10px] py-[20px] md:pl-[50px] font-bold">
+        <p dir="rtl" className="text-right">
+          {advice.content.length < 50 ? advice.content : "..." + advice.content.slice(0, 50)}
+        </p>
       </td>
     </tr>
   )

@@ -7,3 +7,14 @@ body {
   font-family: "Cairo", serif;
   background-color: rgba(246, 245, 242, 1);
 }
+textarea::-webkit-scrollbar {
+  width: 12px;
+}
+textarea::-webkit-scrollbar-thumb {
+  background: #057107;
+  border-radius: 25px;
+  cursor: default;
+}
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #057107;
+}

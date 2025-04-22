@@ -104,7 +104,7 @@ export default function Tip(){
           <span className="text-[#535763]">{advice.length !== 0 ? (advice.created_at).slice(0, 10) : ""}</span>
           <span className="text-[#535763]">{advice.length !== 0 ? advice.adviser_email : ""}</span>
         </div>
-        <div className="bg-[#dddddd] border-2 border-[#AEAEAE] mt-[15px] rounded-lg text-right py-[10px] px-[25px]">
+        <div dir="rtl" className="bg-[#dddddd] border-2 border-[#AEAEAE] mt-[15px] rounded-lg text-right py-[10px] px-[25px]">
           {advice.length !== 0 ? advice.content : ""}
         </div>
       </div>

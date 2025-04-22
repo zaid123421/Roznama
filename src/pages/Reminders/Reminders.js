@@ -3,21 +3,20 @@ import Header from "../../components/Header/Header";
 import axios from "axios";
 import BASE_URL from "../../config";
 import Cookies from "universal-cookie";
-import Button from "../../components/Button/Button";
 import { useNavigate } from "react-router-dom";
+import Model from "../../components/Models/Model";
 import successImage from '../../assets/success.gif';
 import failureImage from '../../assets/failure.png'
-import Model from "../../components/Models/Model";
 import Loading from "../../components/Models/Loading";
 import Pagination from "../../components/Models/Pagination";
+import "../../styles/index.css";
 
 export default function Reminders() {
 
   // useState
   const [confirm, setConfirm] = useState(false);
-  const [adviceId, setAdviceId] = useState(null);
   const [refreshPage, setRefreshPage] = useState(1);
-  const [advices, setAdvices] = useState([]);
+  const [reminders, setReminders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
   const [boxMessage, setBoxMessage] = useState("");
@@ -25,6 +24,9 @@ export default function Reminders() {
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [list, setList] = useState(false);
+  const [remindertitle, setReminderTitle] = useState("");
+  const [reminderContent, setReminderContent] = useState("");
+  const [unautherized, setUnauthrized] = useState(false);
 
   // useNavigate
   const nav = useNavigate();
@@ -47,78 +49,83 @@ export default function Reminders() {
   };
 
   // Mapping
-  const showAdvices = advices.map((advice, index) =>
-    <tr onClick={() => nav(`/tip?tip_id=${advice.id}`)} key={index} className="border-2 border-[#AEAEAE] cursor-pointer">
-      <td className="text-center px-[5px]">
-      <i onClick={(e) => {setAdviceId(advice.id); setConfirm(true); e.stopPropagation()}} className="fa-solid
-          fa-trash
-          w-[30px]
-          h-[30px]
-          md:w-[40px]
-          md:h-[40px]
-          inline-flex
-          justify-center
-          items-center
-          bg-[#dbdbdb]
-          mr-[10px]
-          rounded-md
-          cursor-pointer
-          text-[#BF305E]
-          duration-300
-          hover:bg-slate-200"
-        />
-      </td>
+  const showReminders = reminders.map((reminder, index) =>
+    <tr onClick={() => nav(`/tip?tip_id=${reminder.id}`)} key={index} className="border-2 border-[#AEAEAE] cursor-pointer">
       <td className="text-center p-[10px] text-[12px] md:text-[16px]">
-        {(advice.created_at).slice(0, 10)}
+        {(reminder.created_at).slice(0, 10)}
       </td>
-      <td className="text-[14px] md:text-[18px] text-end md:text-center p-[10px] py-[20px] md:pl-[50px] font-bold">
-        {advice.content.length < 50 ? advice.content : "..." + advice.content.slice(0, 50)}
+      <td dir="rtl" className="text-[14px] md:text-[18px] text-end p-[10px] py-[20px] md:pl-[50px] font-bold">
+        <p className="text-right">{reminder.content}</p>
+      </td>
+      <td className="text-[14px] md:text-[18px] text-end p-[10px] py-[20px] md:pl-[50px] font-bold">
+        {reminder.title}
       </td>
     </tr>
   )
 
   // useEffect
   useEffect(() => {
-    axios.get(`${BASE_URL}/advice?page=${currentPage}&perPage=10`,{
+    axios.get(`${BASE_URL}/notifications?page=${currentPage}&perPage=10`,{
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
     })
     .then((data) => {
-      setAdvices(data.data.data);
-      setLastPage(data.data.meta.last_page)
+      setLastPage(data.data.meta.last_page);
+      setReminders(data.data.data);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      setBoxMessage("عذرا حدث خطأ ما");
+      setBoxImage(failureImage);
+      setConfirm(false);
+      setIsBoxOpen(true);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
+    });
   }, [currentPage, refreshPage])
 
   useEffect(() => {
     if (isBoxOpen) {
       const timer = setTimeout(() => {
         setIsBoxOpen(false);
+        if(unautherized) {
+          nav('/');
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }
   }, [isBoxOpen]);
 
   // Communicating With Backend
-  async function handleDeleteTip(id) {
+  async function addReminder() {
     setIsLoading(true);
     try{
-      await axios.delete(`${BASE_URL}/advice/${id}`, {
+      await axios.post(`${BASE_URL}/notifications`,
+      {
+        title: remindertitle,
+        content: reminderContent,
+      },
+      {
         headers: {
           Accept: "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
-      setBoxMessage("تم حذف النصيحة بنجاح");
+      }
+    );
+      setBoxMessage("تم إرسال الإشعار بنجاح");
       setBoxImage(successImage);
       setConfirm(false);
       setRefreshPage(refreshPage + 1);
-    } catch {
+    } catch(err) {
       setBoxMessage("عذرا حدث خطأ ما");
       setBoxImage(failureImage);
       setConfirm(false);
+      if(err.response && err.response.status === 401) {
+        setUnauthrized(true);
+      }
     } finally {
       setIsLoading(false);
       setIsBoxOpen(true);
@@ -170,17 +177,19 @@ export default function Reminders() {
         </div>
       </div>
       {/* صندوق محتوى الصفحة والجدول */}
-      <div className="mt-[15px] container m-auto px-[10px] md:px-[25px] overflow-x-auto">
+      <div 
+      className="mt-[15px] container m-auto px-[10px] md:px-[25px] overflow-x-auto">
         <table className="w-full mb-[20px]">
           <thead>
             <tr className="text-[#535763]">
-              <th className="w-1/8 pb-[15px]">حذف</th>
-              <th className="w-1/8 pb-[15px]">التاريخ</th>
-              <th className="w-3/4 pb-[15px] text-end">التذكير</th>
+              {/* <th className="w-1/8 pb-[15px]">حذف</th> */}
+              <th className="w-1/3 pb-[15px]">التاريخ</th>
+              <th className="w-1/3 pb-[15px] text-end">التذكير</th>
+              <th className="w-1/3 pb-[15px] text-end">العنوان</th>
             </tr>
           </thead>
           <tbody>
-            {showAdvices}
+            {showReminders}
           </tbody>
         </table>
       </div>
@@ -198,38 +207,6 @@ export default function Reminders() {
         z-50
         px-[25px]"
         >
-          <div
-            style={{ boxShadow: "0px 15px 20px 5px rgba(0, 0, 0, 0.25)" }}
-            className="bg-white text-base w-full flex flex-col p-[20px] md:w-[800px] md:text-xl rounded"
-          >
-            <p className="text-right">هل تريد بالتأكيد حذف التذكير ؟</p>
-            <div className="flex justify-between mt-[50px]">
-              <Button className="bg-green-600
-                text-white
-                w-[100px]
-                h-[40px]
-                md:w-[282px]
-                md:h-[65px]
-                rounded-[10px]
-                hover:text-black
-                hover:bg-transparent
-                hover:border-green-600
-                duration-300
-                border-2
-                border-green-600"
-                label="حذف"
-                onClick={() => handleDeleteTip(adviceId)}
-                />
-              <Button onClick={() => setConfirm(false)}
-                className="hover:bg-gray-300
-              rounded-[10px]
-              duration-300
-              px-[30px]
-              py-[3px]"
-              label= "رجوع"
-              />
-            </div>
-          </div>
       </div>
       }
       {/* Pagination */}
@@ -239,6 +216,48 @@ export default function Reminders() {
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
       />
+      {/* Add Reminder Box */}
+      <div style={{boxShadow: "0 4px 10px 0px grey"}}
+      className="container m-auto my-[25px] relative h-fit rounded-2xl">
+        <input
+        placeholder="عنوان التذكير"
+        className="w-full rounded-t-2xl border-b-[3px] outline-none p-[10px] pr-[25px] text-right"
+        value={remindertitle}
+        onChange={(e) => setReminderTitle(e.target.value)}
+        />
+        <textarea
+        className="w-full
+        bg-white
+        rounded-b-2xl
+        text-right
+        p-[25px]
+        outline-none
+        resize-none
+        pl-[70px]
+        scrollbar
+        scrollbar-thin
+        scrollbar-thumb-red-400
+        scrollbar-track-red-200"
+        placeholder="موضوع التذكير"
+        value={reminderContent}
+        onChange={(e) => setReminderContent(e.target.value)}
+        />
+        <i
+        onClick={addReminder}
+        className="ri-send-plane-2-fill
+          inline-block rotate-180
+          bg-green-700
+          px-[12px]
+          py-[8px]
+          rounded-xl
+          text-white
+          text-[14px]
+          absolute
+          left-[30px]
+          bottom-[20px]
+          cursor-pointer
+          " />
+      </div>
       {/* Models */}
       {isBoxOpen && <Model message={boxMessage} imageSrc={boxImage}/>}
       {isLoading && <Loading />}
