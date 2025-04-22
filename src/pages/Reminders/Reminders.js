@@ -74,6 +74,8 @@ export default function Reminders() {
     .then((data) => {
       setLastPage(data.data.meta.last_page);
       setReminders(data.data.data);
+      setReminderTitle("");
+      setReminderContent("");
     })
     .catch((err) => {
       console.log(err);
