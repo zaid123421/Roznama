@@ -217,7 +217,7 @@ export default function Reminders() {
         onNextPage={handleNextPage}
       />
       {/* Add Reminder Box */}
-      <div style={{boxShadow: "0 4px 10px 0px grey"}}
+      <div dir="rtl" style={{boxShadow: "0 4px 10px 0px grey"}}
       className="container m-auto my-[25px] relative h-fit rounded-2xl">
         <input
         placeholder="عنوان التذكير"
