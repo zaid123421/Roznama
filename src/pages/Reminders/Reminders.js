@@ -220,7 +220,7 @@ export default function Reminders() {
       />
       {/* Add Reminder Box */}
       <div dir="rtl" style={{boxShadow: "0 4px 10px 0px grey"}}
-      className="container m-auto my-[25px] relative h-fit rounded-2xl">
+      className="container m-auto my-[25px] relative rounded-2xl">
         <input
         placeholder="عنوان التذكير"
         className="w-full rounded-t-2xl border-b-[3px] outline-none p-[10px] pr-[25px] text-right"

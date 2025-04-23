@@ -31,7 +31,7 @@ export default function Login() {
       nav("/sections")
     } catch (err) {
       console.log(err);
-      if (err.response.status === 422 || err.response.status === 500) {
+      if (err.response.status === 422 || err.response.status === 500 || err.response.status === 400) {
         setError(true);
       }
     }
